@@ -17,8 +17,8 @@ coordinates are intentional. They are not private network configuration.
 
 ## MMT remaining work
 
-- Configure protected release signing; current Gradle release config still uses debug signing.
+- Supply and back up an owner-controlled release key; missing credentials now fail release builds.
 - Choose public versus invitation-only catalog access and corresponding OAuth behavior.
 - Supply the exact ignored runtime or deliberately update all pins and license notices.
-- Confirm redistribution provenance of the Stitch-derived logo and mount artwork.
+- Confirm redistribution provenance of the remaining Stitch mount illustration; the logo has been replaced with recorded original generated artwork.
 - Test wake, Wi-Fi association, pairing, install, start, webpage, stop and reconnect.

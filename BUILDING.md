@@ -10,12 +10,12 @@ The source tree intentionally excludes `assets/runtime/pilot.tar.gz`.
 Supply the matching runtime from an authorized source and verify its SHA-256:
 
 ```
-a0e8911e1f40694dbcd79055f9b8d84f714dad503f1eaf4039c2a9f8f13ca734
+dae7501b5a97ff3bcf0840496a724fc3e75c1c8b3747832651938373989a2b2d
 ```
 
 This is the current development runtime, not a promise of a public download.
-The port repository contains source recipes, but its latest license-added archive
-has a different hash. Do not rename a different archive to bypass this check.
+This pin matches port candidate 0.1.0-rc.1, including the standalone native
+bootstrap and source-availability notice. Do not rename a different archive to bypass this check.
 Changing runtime versions requires updating `assets/catalog.json`, `bundleHash`
 in `lib/benro.dart`, the manifest digest/sizes, and regenerated license notices as
 one reviewed change. Preserve archive safety and integrity checks.
@@ -33,9 +33,8 @@ python3 -B -m unittest discover -s test -p 'test_*.py'
 ```
 
 `flutter build` generates the Android Gradle wrapper if needed. The debug APK is
-for local development. The current release configuration still selects a debug
-signing key; configure a dedicated release keystore and verify the signer before
-publishing any APK. Keep keys and signing properties out of Git.
+for local development. Release builds require explicit owner signing credentials and fail if they are
+missing. See [release signing](RELEASE-SIGNING.md). Keep keys out of Git.
 
 ## Catalog and OAuth configuration
 
@@ -45,3 +44,9 @@ device flow. A client ID is public configuration; never embed a client secret.
 The existing private-catalog flow requests the GitHub `repo` scope. Tokens are
 stored using Android secure storage. Public-catalog access needs a separate design
 review rather than silently reusing broad private-repository authorization.
+
+Verify the runtime, catalog, notices and final APK together with:
+
+```sh
+python3 scripts/verify-release-inputs.py --apk build/app/outputs/flutter-apk/app-debug.apk
+```

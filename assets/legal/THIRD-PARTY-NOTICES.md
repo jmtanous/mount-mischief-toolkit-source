@@ -13,3 +13,9 @@ that apply when distributing particular third-party binaries.
 
 Benro and upstream project names identify compatibility and provenance; this
 independent port is not endorsed by those projects or companies.
+
+The runtime's port notices include SOURCE-AVAILABILITY.md with exact source
+inventory locations and instructions for the certifi/zeroconf source companion.
+Original MMT clay-mount artwork was generated for this project; see
+assets/branding/ARTWORK.md. The separate Stitch mount illustration still requires
+redistribution-provenance review before an installable public release.

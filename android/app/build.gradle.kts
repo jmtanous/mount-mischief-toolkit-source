@@ -4,6 +4,24 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Release credentials are supplied by the user's environment, never committed.
+val releaseStore = System.getenv("MMT_KEYSTORE_PATH")
+val releaseStorePassword = System.getenv("MMT_KEYSTORE_PASSWORD")
+val releaseAlias = System.getenv("MMT_KEY_ALIAS")
+val releaseKeyPassword = System.getenv("MMT_KEY_PASSWORD")
+val hasReleaseSigning = listOf(releaseStore, releaseStorePassword, releaseAlias,
+    releaseKeyPassword).all { !it.isNullOrBlank() }
+val releaseRequested = gradle.startParameter.taskNames.any {
+    it.contains("release", ignoreCase = true)
+}
+if (releaseRequested && !hasReleaseSigning) {
+    throw GradleException("Release signing is not configured. Set MMT_KEYSTORE_PATH, " +
+        "MMT_KEYSTORE_PASSWORD, MMT_KEY_ALIAS and MMT_KEY_PASSWORD. See RELEASE-SIGNING.md.")
+}
+if (hasReleaseSigning && !file(releaseStore!!).isFile) {
+    throw GradleException("MMT_KEYSTORE_PATH must point to an existing release keystore.")
+}
+
 android {
     namespace = "org.mountmischief.mount_mischief_toolkit"
     compileSdk = flutter.compileSdkVersion
@@ -31,11 +49,22 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStore!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 }
