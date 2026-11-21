@@ -129,7 +129,7 @@ class _EntryFlowState extends State<EntryFlow> {
     ),
     const SizedBox(height: 10),
     const Text(
-      'Small app. Expensive equipment. Questionable decisions.',
+      'It worked before I touched it.',
       textAlign: TextAlign.center,
       style: TextStyle(fontSize: 14, height: 1.4, color: Color(0xffcabeff)),
     ),
@@ -358,8 +358,7 @@ class _EntryFlowState extends State<EntryFlow> {
   ];
 }
 
-/// The original PNG embedded in the user's Stitch export. Scale inside the
-/// frame to make its mark legible without rewriting or cropping the source file.
+/// Clay mount artwork shared with the Android launcher icon.
 class ToolkitEmblem extends StatelessWidget {
   final double size;
   const ToolkitEmblem({super.key, this.size = 104});
@@ -371,15 +370,16 @@ class ToolkitEmblem extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
+        color: const Color(0xff301044),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xff484555)),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Transform.scale(
-        scale: 1.4,
+      child: Padding(
+        padding: EdgeInsets.all(size * 0.04),
         child: Image.asset(
-          'assets/branding/stitch-emblem.png',
-          fit: BoxFit.cover,
+          'assets/branding/bandaged-mount.png',
+          fit: BoxFit.contain,
           excludeFromSemantics: true,
         ),
       ),
