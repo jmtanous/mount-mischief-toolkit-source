@@ -1,7 +1,7 @@
 # Public release checklist
 
-This repository is a local source candidate with fresh history. It contains no
-remote configuration and has not been published. No signed download is promised.
+This repository is an experimental source preview with fresh history.
+Installable releases are still being prepared; no signed download is available.
 
 - [x] MIT for original contributions; upstream notices retained unchanged.
 - [x] Exclude private lab history, physical-session evidence and personal device/network identifiers.
@@ -9,7 +9,8 @@ remote configuration and has not been published. No signed download is promised.
 - [ ] Complete the component-level binary license/source compliance review.
 - [ ] Freeze versioned release packages and their hashes together.
 - [ ] Complete attended Pixel/Polaris acceptance of those exact packages.
-- [ ] Review the final source and downloads, then explicitly authorize publication.
+- [x] Review the source snapshot and authorize public source-preview publication.
+- [ ] Review and authorize the final installable downloads before release.
 
 Default device addresses, disconnected loopback targets and fictional test
 coordinates are intentional. They are not private network configuration.
