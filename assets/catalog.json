@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "projects": [
+    {
+      "schema": 1,
+      "id": "alpaca-pilot",
+      "name": "Alpaca Pilot",
+      "version": "2.2-beta8",
+      "adapter": "alpaca-pilot-v1",
+      "min_manager_schema": 1,
+      "devices": [
+        "benro-polaris"
+      ],
+      "sha256": "a0e8911e1f40694dbcd79055f9b8d84f714dad503f1eaf4039c2a9f8f13ca734",
+      "manifest_sha256": "1e718e8c43b749357761a15e78d72e3ae81e2d480e4850bc053840a43b7f8a6e",
+      "archive_bytes": 59423533,
+      "unpacked_bytes": 173238857,
+      "resources": [
+        "benro-controller",
+        "tcp:5555",
+        "tcp:5556",
+        "tcp:8081"
+      ]
+    }
+  ]
+}

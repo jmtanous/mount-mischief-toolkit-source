@@ -1,0 +1,40 @@
+name: mount_mischief_toolkit
+description: Independent project manager for compatible field hardware.
+publish_to: none
+version: 0.1.0+1
+environment:
+  sdk: '>=3.14.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  material_ui: ^1.11.1
+  dartssh2: 4.1.0
+  flutter_secure_storage: ^9.2.4
+  path_provider: ^2.1.5
+  http: ^1.4.0
+  crypto: ^3.0.6
+  geolocator: ^14.0.0
+  shared_preferences: ^2.5.0
+  url_launcher: ^6.3.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - LICENSE
+    - assets/legal/
+    - assets/catalog.json
+    - assets/runtime/pilot.tar.gz
+    - assets/helper/
+    - assets/branding/
+    - assets/fonts/RedHatDisplay-OFL.txt
+    - assets/fonts/RadioCanadaBig-OFL.txt
+  fonts:
+    - family: RedHatDisplay
+      fonts:
+        - asset: assets/fonts/RedHatDisplay.ttf
+    - family: RadioCanadaBig
+      fonts:
+        - asset: assets/fonts/RadioCanadaBig.ttf
