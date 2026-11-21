@@ -15,6 +15,7 @@ import 'entry_flow.dart';
 import 'catalog.dart';
 import 'models.dart';
 import 'startup_progress.dart';
+import 'installation_progress.dart';
 
 const independence = communityNotice;
 const platform = MethodChannel('org.mountmischief/toolkit');
@@ -191,7 +192,9 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
   int tab = 0, controllerCount = 0;
   bool busy = false, signedIn = false, inspected = false;
   bool setupIncomplete = false;
+  bool setupUpdateRequired = false;
   StartupProgress? startup;
+  InstallationProgress? installation;
   StreamSubscription<dynamic>? wifiSubscription;
   Map<String, dynamic>? wifiConnection;
   static const wifiEvents = EventChannel('org.mountmischief/wifi-status');
@@ -287,6 +290,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     unawaited(wifiSubscription?.cancel());
     startup?.dispose();
+    installation?.dispose();
     catalog.close();
     device?.close();
     host.dispose();
@@ -341,6 +345,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     device = null;
     inspected = false;
     setupIncomplete = false;
+    setupUpdateRequired = false;
     installed = [];
     operations = [];
     controllerCount = 0;
@@ -381,6 +386,8 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
         startup?.dispose();
         startup = null;
       }
+      installation?.dispose();
+      installation = null;
       busy = true;
       error = null;
     });
@@ -468,6 +475,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     setState(() {
       inspected = false;
       setupIncomplete = false;
+      setupUpdateRequired = false;
       installed = [];
       operations = [];
     });
@@ -610,8 +618,31 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
             .toList();
         controllerCount = state['controller_clients'] as int? ?? 0;
         setupIncomplete = state['setup_incomplete'] == true;
+        setupUpdateRequired = state['setup_update_required'] == true;
         inspected = !setupIncomplete;
       });
+    }
+  }
+
+  Future<void> trackInstallation(
+    String title,
+    Future<void> Function() action, {
+    bool toolkitOnly = false,
+  }) async {
+    final tracker = InstallationProgress(title, toolkitOnly: toolkitOnly);
+    final target = device!;
+    if (mounted) setState(() => installation = tracker);
+    target.onInstallationProgress = tracker.update;
+    try {
+      await action();
+      tracker.update(const InstallationEvent('finish'));
+      await refreshDevice();
+      tracker.finish();
+    } catch (error) {
+      tracker.finish(error: error);
+      rethrow;
+    } finally {
+      target.onInstallationProgress = null;
     }
   }
 
@@ -619,7 +650,11 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     final proceed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Repair Toolkit setup?'),
+        title: Text(
+          setupUpdateRequired
+              ? 'Update Toolkit tools?'
+              : 'Repair Toolkit setup?',
+        ),
         content: const Text(
           'This restores Toolkit’s SD runtime and helpers. Project files and settings are preserved. A replaced runtime is retained for inspection. Disconnect other controllers and keep Toolkit open until repair finishes.',
         ),
@@ -630,7 +665,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Repair setup'),
+            child: Text(setupUpdateRequired ? 'Update tools' : 'Repair setup'),
           ),
         ],
       ),
@@ -638,8 +673,11 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     if (proceed != true) return;
     final bootstrap = await catalog.bootstrap();
     await platform.invokeMethod<void>('bindWifi');
-    await device!.repairSetup(bootstrap);
-    await refreshDevice();
+    await trackInstallation(
+      'Setting up Toolkit',
+      () => device!.repairSetup(bootstrap),
+      toolkitOnly: true,
+    );
   }
 
   Future<void> signIn() async {
@@ -741,14 +779,16 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
       }
     }
     if (current?.running == true) await device!.stop(p.id);
-    await device!.install(
-      p,
-      archive,
-      bootstrap,
-      reinstall: current != null,
-      keepSettings: keep,
+    await trackInstallation(
+      'Installing ${p.name}',
+      () => device!.install(
+        p,
+        archive,
+        bootstrap,
+        reinstall: current != null,
+        keepSettings: keep,
+      ),
     );
-    await refreshDevice();
     if (mounted) setState(() => tab = 2);
   }
 
@@ -1304,6 +1344,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
             ),
           ],
         ),
+      if (setupUpdateRequired) toolkitUpdateNotice(),
       if (setupIncomplete) ...[
         const Text(
           'Restore MMT’s supporting tools on the mount’s SD card. Installed projects and saved settings are preserved.',
@@ -1499,6 +1540,35 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     ),
   );
 
+  Widget toolkitUpdateNotice() => Card(
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Toolkit tools update available',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            installed.any((p) => p.running)
+                ? 'Stop Pilot in Installed, then update the tools on the SD card. Your projects and settings are kept.'
+                : controllerCount != 0
+                ? 'Disconnect other controllers before updating the tools on the SD card.'
+                : 'Update the tools on the SD card. Your projects and settings are kept.',
+          ),
+          action(
+            'Update Toolkit tools',
+            () => run(repairSetup),
+            enabled: controllerCount == 0 && !installed.any((p) => p.running),
+            icon: Icons.system_update_alt,
+          ),
+        ],
+      ),
+    ),
+  );
+
   Widget installedPage() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -1508,6 +1578,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
       ),
       if (device != null)
         action('Refresh device', () => run(refreshDevice), icon: Icons.refresh),
+      if (setupUpdateRequired) toolkitUpdateNotice(),
       if (!inspected)
         const Text('Pair and inspect a device to see its projects.'),
       if (inspected && installed.isEmpty)
@@ -1722,8 +1793,11 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
       child: Column(
         children: [
           if (startup != null) StartupProgressCard(progress: startup!),
-          if (busy && startup?.active != true) const LinearProgressIndicator(),
-          if (busy && startup?.active != true)
+          if (installation != null)
+            InstallationProgressCard(progress: installation!),
+          if (busy && startup?.active != true && installation?.active != true)
+            const LinearProgressIndicator(),
+          if (busy && startup?.active != true && installation?.active != true)
             const Padding(
               padding: EdgeInsets.all(8),
               child: Text(
@@ -1736,8 +1810,9 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (message !=
-                      'Download a project, then connect to your device Wi-Fi.')
+                  if (installation?.active != true &&
+                      message !=
+                          'Download a project, then connect to your device Wi-Fi.')
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Text(

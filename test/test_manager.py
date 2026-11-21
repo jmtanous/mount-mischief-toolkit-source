@@ -41,6 +41,38 @@ class PackageTests(unittest.TestCase):
     def install(self,operation='first',op='install',keep=True):
         return self.manager.dispatch({'op':op,'project':'pilot','operation':operation,'manifest':self.package(operation),'keep_settings':keep})
 
+    def test_install_reports_ordered_stages_and_real_file_totals(self):
+        events=[]
+        self.manager.progress=lambda *args: events.append(args)
+        self.install()
+        stages=list(dict.fromkeys(e[0] for e in events))
+        self.assertEqual(stages, ['checksum','scan','extract','verify','activate'])
+        self.assertIn(('extract',2,2),events)
+        self.assertIn(('verify',1,1),events)
+
+    def test_bad_archive_never_reports_activation(self):
+        events=[]
+        self.manager.progress=lambda *args: events.append(args)
+        m=self.package(extra={'../escape':b'bad'})
+        with self.assertRaises(ValueError):
+            self.manager.install('pilot','first',m,True)
+        self.assertNotIn('activate',[e[0] for e in events])
+        self.assertIsNone(self.manager.record('pilot'))
+
+    def test_progress_is_opt_in_and_throttled(self):
+        from manager import progress_reporter
+        from contextlib import redirect_stderr
+        output=io.StringIO()
+        with redirect_stderr(output):
+            progress_reporter(False)('checksum')
+        self.assertEqual(output.getvalue(),'')
+        with redirect_stderr(output), patch('manager.time.monotonic',return_value=1):
+            report=progress_reporter(True)
+            for n in range(10001): report('extract',n,10000)
+        events=[json.loads(line) for line in output.getvalue().splitlines()]
+        self.assertEqual(len(events),2)
+        self.assertEqual(events[-1]['done'],10000)
+
     def test_install_does_not_start_and_is_idempotent(self):
         self.install()
         self.assertTrue(self.manager.record('pilot'))

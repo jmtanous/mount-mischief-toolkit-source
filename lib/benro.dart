@@ -1,3 +1,5 @@
+import 'installation_progress.dart';
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -143,6 +145,13 @@ class Keepalive {
 }
 
 class Benro {
+  void Function(InstallationEvent)? onInstallationProgress;
+  String _installationStage = 'toolkit';
+  void installationStage(String stage) {
+    _installationStage = stage;
+    onInstallationProgress?.call(InstallationEvent(stage));
+  }
+
   final String host;
   final String base;
   final void Function(String) progress;
@@ -255,6 +264,7 @@ class Benro {
   Future<String> shell(
     String command, {
     Stream<List<int>>? input,
+    void Function(String)? onStderrLine,
     Duration timeout = const Duration(minutes: 5),
   }) async {
     final client = _client;
@@ -271,7 +281,15 @@ class Benro {
         session.close();
         throw TimeoutException('SSH command expired');
       }
-      Future<List<int>> collect(Stream<Uint8List> stream) async {
+      Future<List<int>> collect(
+        Stream<Uint8List> stream, {
+        void Function(String)? onLine,
+      }) async {
+        final lines = onLine == null
+            ? null
+            : const Utf8Decoder(allowMalformed: true).startChunkedConversion(
+                const LineSplitter().startChunkedConversion(_LineSink(onLine)),
+              );
         final bytes = <int>[];
         await for (final chunk in stream) {
           if (bytes.length + chunk.length > 2 * 1024 * 1024) {
@@ -279,13 +297,15 @@ class Benro {
             throw StateError('Device response too large');
           }
           bytes.addAll(chunk);
+          lines?.add(chunk);
         }
+        lines?.close();
         return bytes;
       }
 
       final output = Future.wait([
         collect(session.stdout),
-        collect(session.stderr),
+        collect(session.stderr, onLine: onStderrLine),
       ], eagerError: true);
       final write = () async {
         if (input != null) {
@@ -424,6 +444,32 @@ class Benro {
     return true;
   }
 
+  // The rc.1 helper set uses the same list/stop protocol. Only this exact,
+  // previously shipped set is allowed to manage projects before an update.
+  static const compatibleHelperHashes = {
+    'manager.py':
+        'f49e75e010b13c66160d0ba2655316d14e8e6a8ed8abfcfb53c1973acce59e45',
+    'pilot_adapter.py':
+        'a94d3da83619597026c58af4376c204429e7f0fdec1c31722eef16b2311450b1',
+    'pilot_native.py':
+        'fab5e63f3b05176938f2f4f9e18ef2b8c80f89927c16b979cc6cc8800b79e9a1',
+  };
+
+  Future<bool> hasCompatibleHelpers() async {
+    final output = await shell(
+      'sha256sum ${compatibleHelperHashes.keys.map((name) => quote('$base/$name')).join(' ')} 2>/dev/null || true',
+      timeout: const Duration(seconds: 15),
+    );
+    final actual = <String, String>{};
+    for (final line in output.split('\n')) {
+      final parts = line.trim().split(RegExp(r'\s+'));
+      if (parts.length == 2) actual[parts[1]] = parts[0];
+    }
+    return compatibleHelperHashes.entries.every(
+      (entry) => actual['$base/${entry.key}'] == entry.value,
+    );
+  }
+
   Future<int> controllers() async => int.parse(
     await shell(
       "awk 'NR>1 && \$2 ~ /:2382\$/ && \$4==\"01\" {n++} END {print n+0}' /proc/net/tcp",
@@ -440,6 +486,9 @@ class Benro {
       if (percent != last) {
         last = percent;
         progress('Uploading package: $percent%');
+        onInstallationProgress?.call(
+          InstallationEvent(_installationStage, done: sent, total: size),
+        );
       }
       return chunk;
     });
@@ -450,15 +499,21 @@ class Benro {
     );
   }
 
+  void toolkitProgress(String detail) {
+    progress(detail);
+    onInstallationProgress?.call(InstallationEvent('toolkit', detail: detail));
+  }
+
   Future<void> ensureToolchain(File bundled) async {
-    progress('Checking the SD runtime…');
+    installationStage('toolkit');
+    toolkitProgress('Checking the SD runtime…');
     if (!await hasToolchain()) {
-      progress('Verifying the local runtime archive…');
+      toolkitProgress('Verifying the local runtime archive…');
       if ((await sha256.bind(bundled.openRead()).first).toString() !=
           bundleHash) {
         throw StateError('Bootstrap archive failed verification');
       }
-      progress('Checking free SD space…');
+      toolkitProgress('Checking free SD space…');
       final space = (await shell(
         "stat -f -c '%a %S' ${quote(Directory(base).parent.path)}",
       )).split(RegExp(r'\s+'));
@@ -474,16 +529,16 @@ class Benro {
       }
       final stage = '$base/bootstrap-${operationId()}';
       final backup = '$base/toolchain-backup-${operationId()}';
-      progress('Creating the SD staging directory…');
+      toolkitProgress('Creating the SD staging directory…');
       await shell('mkdir -p ${quote(stage)}');
       await upload(bundled, '$stage/archive.tar.gz');
-      progress('Verifying the uploaded runtime archive…');
+      toolkitProgress('Verifying the uploaded runtime archive…');
       final actual = await shell('sha256sum ${quote('$stage/archive.tar.gz')}');
       if (actual.split(' ').first != bundleHash) {
         throw StateError('Bootstrap transfer checksum failed');
       }
       // This exact pinned bundle was audited to contain only regular files/directories.
-      progress('Preparing the SD runtime…');
+      toolkitProgress('Preparing the SD runtime…');
       await shell(
         'tar -xzf ${quote('$stage/archive.tar.gz')} -C ${quote(stage)} && '
         'env PYTHONNOUSERSITE=1 LD_LIBRARY_PATH=${quote('$stage/opt/benro-python/lib:/lib:/usr/lib:/app/lib')} ${quote('$stage/opt/benro-python/bin/python3.13')} -I -c ${quote('import hashlib, json, tarfile, fcntl')} && '
@@ -493,7 +548,7 @@ class Benro {
         timeout: const Duration(minutes: 15),
       );
     }
-    progress('Preparing Toolkit helper files…');
+    toolkitProgress('Preparing Toolkit helper files…');
     await shell('mkdir -p ${quote('$base/inbox')}');
     for (final name in ['manager.py', 'pilot_adapter.py', 'pilot_native.py']) {
       final bytes = await rootBundle.load('assets/helper/$name');
@@ -502,7 +557,7 @@ class Benro {
         bytes.lengthInBytes,
       );
       final destination = '$base/$name';
-      progress('Updating Toolkit helper: $name…');
+      toolkitProgress('Updating Toolkit helper: $name…');
       await shell(
         'cat > ${quote('$destination.new')}',
         input: Stream.value(data),
@@ -521,12 +576,42 @@ class Benro {
     Map<String, dynamic> fields = const {},
     Duration timeout = const Duration(minutes: 5),
   }) async {
-    final request = {'op': op, 'project': ?project, ...fields};
+    final report =
+        onInstallationProgress != null &&
+        (op == 'install' || op == 'reinstall');
+    final request = {
+      'op': op,
+      'project': ?project,
+      ...fields,
+      if (report) 'progress': true,
+    };
     final command =
         'env PYTHONNOUSERSITE=1 LD_LIBRARY_PATH=${quote('$python/lib:/lib:/usr/lib:/app/lib')} ${quote('$python/bin/python3.13')} -B ${quote('$base/manager.py')}';
     final raw = await shell(
       command,
       input: Stream.value(utf8.encode(jsonEncode(request))),
+      onStderrLine: report
+          ? (line) {
+              try {
+                final event = jsonDecode(line);
+                if (event is Map &&
+                    event['type'] == 'installation_progress' &&
+                    event['stage'] is String) {
+                  onInstallationProgress?.call(
+                    InstallationEvent(
+                      event['stage'] as String,
+                      done: event['done'] is int ? event['done'] as int : null,
+                      total: event['total'] is int
+                          ? event['total'] as int
+                          : null,
+                    ),
+                  );
+                }
+              } on FormatException {
+                /* Non-progress diagnostics remain in stderr. */
+              }
+            }
+          : null,
       timeout: timeout,
     );
     final response = jsonDecode(raw) as Map<String, dynamic>;
@@ -536,7 +621,11 @@ class Benro {
 
   Future<Map<String, dynamic>> inspect() async {
     final count = await otherControllers();
-    if (!await hasToolchain() || !await hasHelpers()) {
+    final runtimeReady = await hasToolchain();
+    final helpersCurrent = runtimeReady && await hasHelpers();
+    final helpersCompatible =
+        helpersCurrent || (runtimeReady && await hasCompatibleHelpers());
+    if (!helpersCompatible) {
       final exists = await shell(
         'if test -d ${quote(base)}; then echo yes; else echo no; fi',
       );
@@ -549,6 +638,7 @@ class Benro {
     }
     return {
       ...await call('list', timeout: const Duration(seconds: 40)),
+      'setup_update_required': !helpersCurrent,
       'controller_clients': count,
     };
   }
@@ -600,6 +690,7 @@ class Benro {
           'keep_settings': keepSettings,
         },
       );
+      installationStage('upload');
       await upload(archive, '$base/inbox/$operation.tar.gz.part');
       await shell(
         'mv ${quote('$base/inbox/$operation.tar.gz.part')} ${quote('$base/inbox/$operation.tar.gz')}',
@@ -770,4 +861,13 @@ class Benro {
     _client = null;
     _heartbeatSourceAddress = null;
   }
+}
+
+class _LineSink implements Sink<String> {
+  final void Function(String) onLine;
+  _LineSink(this.onLine);
+  @override
+  void add(String line) => onLine(line);
+  @override
+  void close() {}
 }

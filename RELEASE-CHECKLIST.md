@@ -19,6 +19,9 @@ coordinates are intentional. They are not private network configuration.
 
 - Supply and back up an owner-controlled release key; missing credentials now fail release builds.
 - Choose public versus invitation-only catalog access and corresponding OAuth behavior.
-- Supply the exact ignored runtime or deliberately update all pins and license notices.
+- [x] Align the exact bundled runtime, manifest and license notices; build 4 APK inputs verified.
 - Confirm redistribution provenance of the remaining Stitch mount illustration; the logo has been replaced with recorded original generated artwork.
-- Test wake, Wi-Fi association, pairing, install, start, webpage, stop and reconnect.
+- [x] Attended existing-SD flow: helper setup, reinstall preserving settings, startup, webpage, stop and reconnect on build 3.
+- [x] Build 4 helper-upgrade regression tested automatically and APK installed.
+- [ ] Fresh-SD installation acceptance (owner testing in progress).
+- [ ] Repeat prior-helper upgrade on physical hardware with build 4.

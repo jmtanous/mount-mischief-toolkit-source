@@ -36,6 +36,7 @@ class ManagedDevice extends Benro {
   bool installed = true;
   bool running = true;
   bool incomplete = false;
+  bool updateRequired = false;
   bool retained = false;
   bool failUninstall = false;
   bool failStart = false;
@@ -74,6 +75,7 @@ class ManagedDevice extends Benro {
     return {
       'controller_clients': running ? 1 : 0,
       'setup_incomplete': incomplete,
+      'setup_update_required': updateRequired,
       'operations': [],
       'projects': [
         if (installed && !incomplete)
@@ -139,6 +141,7 @@ class ManagedDevice extends Benro {
       throw const SocketException('connection lost during repair');
     }
     incomplete = false;
+    updateRequired = false;
   }
 }
 
@@ -867,6 +870,37 @@ void main() {
       );
     }
   }
+  testWidgets(
+    'Old compatible tools keep Stop available and allow update after stopping',
+    (tester) async {
+      device.updateRequired = true;
+      await open(tester);
+      expect(find.text('Toolkit tools update available'), findsOneWidget);
+      final updateButton = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Update Toolkit tools'),
+      );
+      expect(updateButton.onPressed, isNull);
+      expect(find.text('Running'), findsOneWidget);
+      await tap(tester, 'Stop');
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.widgetWithText(FilledButton, 'Stop'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(device.running, isFalse);
+      expect(find.text('Stopped'), findsOneWidget);
+      await tap(tester, 'Update Toolkit tools');
+      await tap(tester, 'Update tools');
+      await tester.pumpAndSettle();
+      expect(events, containsAllInOrder(['stop', 'repair']));
+      expect(device.updateRequired, isFalse);
+      expect(find.text('Toolkit tools update available'), findsNothing);
+      expect(find.text('Alpaca Pilot'), findsOneWidget);
+    },
+  );
+
   testWidgets(
     'Stop requires confirmation and cancellation leaves project running',
     (tester) async {

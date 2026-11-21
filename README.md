@@ -53,3 +53,9 @@ See [third-party notices](assets/legal/THIRD-PARTY-NOTICES.md) and the unchanged
 [upstream license](assets/legal/alpaca-UPSTREAM-LICENSE.txt).
 
 Support is optional: [Buy me a beer](https://buymeacoffee.com/jmtanousk).
+
+## Installation progress
+
+Toolkit setup names its runtime and helper steps. Package installation shows a checklist, transfer bytes, unpacking and verification file counts, activation, and status refresh. Counts apply to the current step, not the whole operation. Keep MMT open and connected; SD installation can take several minutes. Failures retain the last stage with error details below. Installation does not start the project.
+
+Known compatible older Toolkit helpers retain installed-project and Stop controls. MMT offers a tools update once managed projects are stopped and other controllers disconnect. Missing, mixed, or unknown helper sets still require setup repair.

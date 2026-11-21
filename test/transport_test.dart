@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
@@ -80,6 +81,23 @@ Benro transport(Future<SSHSession> Function() create) => Benro(
 );
 
 void main() {
+  test(
+    'stderr progress streams before command completion across UTF8 chunks',
+    () async {
+      final session = FakeSession();
+      final device = transport(() async => session);
+      final lines = <String>[];
+      final result = device.shell('test', onStderrLine: lines.add);
+      final bytes = utf8.encode('Unpacking…\nnext\n');
+      session.errors.add(Uint8List.fromList(bytes.sublist(0, 10)));
+      session.errors.add(Uint8List.fromList(bytes.sublist(10)));
+      await Future<void>.delayed(Duration.zero);
+      expect(lines, ['Unpacking…', 'next']);
+      expect(session.completed.isCompleted, isFalse);
+      session.finish('result');
+      expect(await result, 'result');
+    },
+  );
   test('SSH collects output and closes session', () async {
     final session = FakeSession();
     final device = transport(() async => session);

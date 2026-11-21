@@ -73,20 +73,23 @@ def manifest(value):
     return value
 
 
-def verify(root, expected):
+def verify(root, expected, progress=lambda *args: None):
     p = safe_path(root, 'BUNDLE-MANIFEST.json')
     if digest(p) != expected: raise ValueError('Manifest checksum mismatch')
     files = read(p)['files']
     if not isinstance(files, dict) or not files: raise ValueError('Empty file manifest')
-    for name, record in files.items():
+    progress("verify", 0, len(files))
+    for index, (name, record) in enumerate(files.items(), 1):
         p = safe_path(root, name)
         if not p.is_file() or p.stat().st_size != record['size'] or digest(p) != record['sha256']:
             raise ValueError('Corrupt package file: '+name)
+        progress("verify", index, len(files))
     return files
 
 
 class Manager:
-    def __init__(self, root=ROOT):
+    def __init__(self, root=ROOT, progress=lambda *args: None):
+        self.progress = progress
         self.root = root
         self.projects = root / 'projects'
         self.operations = root / 'operations'
@@ -165,6 +168,7 @@ class Manager:
         old = self.record(project)
         if old and self.adapter(project).process(): raise ValueError('Stop project before reinstalling')
         archive = safe_path(self.root/'inbox', operation+'.tar.gz')
+        self.progress('checksum')
         if archive.stat().st_size != m['archive_bytes'] or digest(archive) != m['sha256']:
             raise ValueError('Archive checksum mismatch')
         project_dir = self.project(project)
@@ -177,6 +181,7 @@ class Manager:
         if keep: self.snapshot_settings(project)
         self.journal(operation, phase='extracting', previous=old, keep_settings=keep)
         stage.mkdir(parents=True)
+        self.progress('scan')
         with tarfile.open(archive, 'r:gz') as tf:
             members = []
             names=set(); total=0
@@ -189,11 +194,17 @@ class Manager:
                 if total > m['unpacked_bytes']: raise ValueError('Archive exceeds declared size')
                 if len(names) > 100000: raise ValueError('Too many archive entries')
                 members.append(member)
-            tf.extractall(stage, members=members, filter='data')
-        files = verify(stage, m['manifest_sha256'])
+            self.progress('extract', 0, len(members))
+            def tracked_members():
+                for index, member in enumerate(members, 1):
+                    yield member
+                    self.progress('extract', index, len(members))
+            tf.extractall(stage, members=tracked_members(), filter='data')
+        files = verify(stage, m['manifest_sha256'], self.progress)
         actual={str(p.relative_to(stage)) for p in stage.rglob('*') if p.is_file()}
         if actual != set(files)|{'BUNDLE-MANIFEST.json'}: raise ValueError('Unmanifested package files')
         self.journal(operation, phase='verified')
+        self.progress('activate')
         if keep:
             saved = read(project_dir/'settings.json')
             if saved is not None: atomic(stage/'opt/alpaca-pilot-2.2/data/config.pilot.json', saved)
@@ -288,12 +299,26 @@ class Manager:
             raise
 
 
+def progress_reporter(enabled):
+    last_stage = None
+    last_time = 0.0
+    def report(stage, done=None, total=None):
+        nonlocal last_stage, last_time
+        now = time.monotonic()
+        if not enabled or (stage == last_stage and done != total and now - last_time < 0.5):
+            return
+        print(json.dumps({'type': 'installation_progress', 'stage': stage,
+                          'done': done, 'total': total}), file=sys.stderr, flush=True)
+        last_stage, last_time = stage, now
+    return report
+
+
 def main():
     ROOT.mkdir(parents=True,exist_ok=True)
     with (ROOT/'manager.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         request=json.load(sys.stdin)
-        result=Manager().dispatch(request)
+        result=Manager(progress=progress_reporter(request.get('progress') is True)).dispatch(request)
         print(json.dumps({'ok':True,'result':result}))
 
 
