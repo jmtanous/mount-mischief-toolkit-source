@@ -51,5 +51,8 @@
     "After Stop, the previous connected banner can remain; the refreshed project status correctly shows Stopped. Reconnecting clears the banner."
   ],
   "release_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/v0.1.0-rc.2",
-  "prerelease": true
+  "prerelease": true,
+  "public_release_asset_digests_verified": true,
+  "anonymous_download_verification": "All MMT release assets downloaded and SHA-256 matched; matching port asset digests verified via anonymous API",
+  "anonymous_catalog_verified": true
 }
