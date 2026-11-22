@@ -530,7 +530,7 @@ class _KeepScreenAwakeSettingState extends State<KeepScreenAwakeSetting> {
   @override
   Widget build(BuildContext context) => SwitchListTile(
     title: const Text('Keep screen awake'),
-    subtitle: Text(failure ?? 'While MMT is open. Uses more battery.'),
+    subtitle: Text(failure ?? 'While MMT or its Pilot browser is open. Uses more battery.'),
     value: enabled ?? false,
     onChanged: enabled == null || saving ? null : change,
   );

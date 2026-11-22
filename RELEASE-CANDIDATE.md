@@ -1,9 +1,13 @@
-# MMT 0.1.0-rc.1 (build 5) — local candidate
+# MMT 0.1.0-rc.1 (build 6) — local candidate
 
 This is a debug-signed test candidate, not a production release.
 The bundled Alpaca Pilot port remains 0.1.0-rc.1.
 
 ## Changes since build 2
+
+- Keep screen awake now also applies to the embedded Pilot browser and releases
+  when that window goes into the background. Android lifecycle regression tests
+  and the settings-screen tests pass.
 
 - Fresh SD cards show “Connected · setup needed,” explain automatic Toolkit setup,
   and link directly to Catalog. Catalog explains that Install sets up Toolkit first.

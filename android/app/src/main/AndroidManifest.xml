@@ -14,7 +14,7 @@
         android:allowBackup="false"
         android:usesCleartextTraffic="true"
         android:label="Mount Mischief Toolkit"
-        android:name="${applicationName}"
+        android:name=".ToolkitApplication"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
