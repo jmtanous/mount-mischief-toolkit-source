@@ -1,0 +1,1912 @@
+{
+  "scope": "Build 9 debug APK. Conservative runtime dependency inventories; not final release APK clearance. POM license metadata alone does not establish packaged notice coverage.",
+  "apk_sha256": "90340a5258f8fab7fd079359750c761208ce4b9cb2d6879d11f7b97af3d02b78",
+  "dart": [
+    {
+      "name": "args",
+      "version": "2.7.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "asn1lib",
+      "version": "1.6.8",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "async",
+      "version": "2.13.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "characters",
+      "version": "1.4.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "clock",
+      "version": "1.1.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "code_assets",
+      "version": "2.2.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "collection",
+      "version": "1.19.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "convert",
+      "version": "3.1.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "crypto",
+      "version": "3.0.8",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "cupertino_ui",
+      "version": "1.1.7",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "dartssh2",
+      "version": "4.1.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "dbus",
+      "version": "0.7.15",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "ffi",
+      "version": "2.2.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "file",
+      "version": "7.0.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "fixnum",
+      "version": "1.1.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "flutter",
+      "version": "None",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "flutter_localizations",
+      "version": "None",
+      "license_files": [],
+      "full_license_text_in_flutter_notices": false,
+      "package_header_in_notices": false
+    },
+    {
+      "name": "flutter_secure_storage",
+      "version": "9.2.4",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "flutter_secure_storage_linux",
+      "version": "1.2.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "flutter_secure_storage_macos",
+      "version": "3.1.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "flutter_secure_storage_platform_interface",
+      "version": "1.1.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "flutter_secure_storage_web",
+      "version": "1.2.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "flutter_secure_storage_windows",
+      "version": "3.1.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "flutter_web_plugins",
+      "version": "None",
+      "license_files": [],
+      "full_license_text_in_flutter_notices": false,
+      "package_header_in_notices": false
+    },
+    {
+      "name": "geoclue",
+      "version": "0.1.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "geolocator",
+      "version": "14.0.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "geolocator_android",
+      "version": "5.2.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "geolocator_apple",
+      "version": "2.4.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "geolocator_linux",
+      "version": "0.2.4",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "geolocator_platform_interface",
+      "version": "4.4.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "geolocator_web",
+      "version": "4.1.4",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "geolocator_windows",
+      "version": "0.2.5",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "gsettings",
+      "version": "0.2.8",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "hooks",
+      "version": "2.2.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "http",
+      "version": "1.6.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "http_parser",
+      "version": "4.1.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "intl",
+      "version": "0.20.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "jni",
+      "version": "1.2.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "jni_flutter",
+      "version": "1.1.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "jni_util",
+      "version": "1.0.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "js",
+      "version": "0.6.7",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "listen",
+      "version": "1.0.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "logging",
+      "version": "1.3.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "material_color_utilities",
+      "version": "0.13.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "material_ui",
+      "version": "1.11.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "meta",
+      "version": "1.19.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "objective_c",
+      "version": "9.6.4",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "package_config",
+      "version": "3.0.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "package_info_plus",
+      "version": "9.0.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "package_info_plus_platform_interface",
+      "version": "3.2.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "path",
+      "version": "1.9.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "path_provider",
+      "version": "2.1.6",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "path_provider_android",
+      "version": "2.3.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "path_provider_foundation",
+      "version": "2.6.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "path_provider_linux",
+      "version": "2.2.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "path_provider_platform_interface",
+      "version": "2.1.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "path_provider_windows",
+      "version": "2.3.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "petitparser",
+      "version": "7.1.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "pinenacl",
+      "version": "0.6.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "platform",
+      "version": "3.2.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "plugin_platform_interface",
+      "version": "2.1.8",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "pointycastle",
+      "version": "4.0.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "pub_semver",
+      "version": "2.2.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "record_use",
+      "version": "1.1.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "shared_preferences",
+      "version": "2.5.6",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "shared_preferences_android",
+      "version": "2.5.5",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "shared_preferences_foundation",
+      "version": "2.6.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "shared_preferences_linux",
+      "version": "2.4.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "shared_preferences_platform_interface",
+      "version": "2.4.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "shared_preferences_web",
+      "version": "2.4.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "shared_preferences_windows",
+      "version": "2.4.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "sky_engine",
+      "version": "None",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": false,
+      "package_header_in_notices": false
+    },
+    {
+      "name": "source_span",
+      "version": "1.10.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "string_scanner",
+      "version": "1.4.1",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "term_glyph",
+      "version": "1.2.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "typed_data",
+      "version": "1.4.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "url_launcher",
+      "version": "6.3.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "url_launcher_android",
+      "version": "6.3.35",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "url_launcher_ios",
+      "version": "6.4.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "url_launcher_linux",
+      "version": "3.2.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "url_launcher_macos",
+      "version": "3.2.6",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "url_launcher_platform_interface",
+      "version": "2.3.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "url_launcher_web",
+      "version": "2.4.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "url_launcher_windows",
+      "version": "3.1.6",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "uuid",
+      "version": "4.6.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "vector_math",
+      "version": "2.4.3",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "web",
+      "version": "1.1.2",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "win32",
+      "version": "5.15.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "xdg_directories",
+      "version": "1.1.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "xml",
+      "version": "7.1.0",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    },
+    {
+      "name": "yaml",
+      "version": "3.1.4",
+      "license_files": [
+        "LICENSE"
+      ],
+      "full_license_text_in_flutter_notices": true,
+      "package_header_in_notices": true
+    }
+  ],
+  "android": [
+    {
+      "coordinate": "androidx.activity:activity:1.9.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.activity:activity-ktx:1.9.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.annotation:annotation:1.10.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.annotation:annotation-experimental:1.4.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.annotation:annotation-jvm:1.10.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.appcompat:appcompat:1.1.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.appcompat:appcompat-resources:1.1.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.arch.core:core-common:2.2.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.arch.core:core-runtime:2.2.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.asynclayoutinflater:asynclayoutinflater:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.browser:browser:1.9.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.collection:collection:1.4.2",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.collection:collection-jvm:1.4.2",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.collection:collection-ktx:1.4.2",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.concurrent:concurrent-futures:1.1.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.coordinatorlayout:coordinatorlayout:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.core:core:1.17.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.core:core-ktx:1.17.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.core:core-viewtree:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.cursoradapter:cursoradapter:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.customview:customview:1.1.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-android:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-core:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-core-android:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-core-okio:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-core-okio-jvm:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-preferences:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-preferences-android:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-preferences-core:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-preferences-core-android:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-preferences-external-protobuf:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "BSD-3-Clause",
+          "url": "https://opensource.org/licenses/BSD-3-Clause",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-preferences-proto:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.documentfile:documentfile:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.drawerlayout:drawerlayout:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.exifinterface:exifinterface:1.4.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.fragment:fragment:1.7.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.fragment:fragment-ktx:1.7.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.interpolator:interpolator:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.legacy:legacy-support-core-ui:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.legacy:legacy-support-core-utils:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-common:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-common-java8:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-livedata:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-livedata-core:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-process:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-runtime:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.loader:loader:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.localbroadcastmanager:localbroadcastmanager:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.preference:preference:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.print:print:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.profileinstaller:profileinstaller:1.3.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.recyclerview:recyclerview:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.savedstate:savedstate:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.savedstate:savedstate-ktx:1.2.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.security:security-crypto:1.1.0-alpha06",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.slidingpanelayout:slidingpanelayout:1.2.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.startup:startup-runtime:1.1.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.tracing:tracing:1.2.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.transition:transition:1.4.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.vectordrawable:vectordrawable:1.1.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.vectordrawable:vectordrawable-animated:1.1.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.versionedparcelable:versionedparcelable:1.1.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.viewpager:viewpager:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.window:window:1.2.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.window:window-java:1.2.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.window.extensions.core:core:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.getkeepsafe.relinker:relinker:1.4.5",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.android.gms:play-services-base:18.3.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "Android Software Development Kit License",
+          "url": "https://developer.android.com/studio/terms.html",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.android.gms:play-services-basement:18.3.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "Android Software Development Kit License",
+          "url": "https://developer.android.com/studio/terms.html",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.android.gms:play-services-location:21.2.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "Android Software Development Kit License",
+          "url": "https://developer.android.com/studio/terms.html",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.android.gms:play-services-tasks:18.1.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "Android Software Development Kit License",
+          "url": "https://developer.android.com/studio/terms.html",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.code.findbugs:jsr305:3.0.2",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.code.gson:gson:2.10.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.crypto.tink:tink-android:1.9.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.errorprone:error_prone_annotations:2.18.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "Apache 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.guava:listenablefuture:1.0",
+      "cached_pom_found": true,
+      "declared_licenses": []
+    },
+    {
+      "coordinate": "com.squareup.okio:okio:3.9.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.squareup.okio:okio-jvm:3.9.1",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "io.flutter:arm64_v8a_debug:1.0.0-4d35714800b9266b6693a58e1225ecd7e9e45ed7",
+      "cached_pom_found": true,
+      "declared_licenses": []
+    },
+    {
+      "coordinate": "io.flutter:armeabi_v7a_debug:1.0.0-4d35714800b9266b6693a58e1225ecd7e9e45ed7",
+      "cached_pom_found": true,
+      "declared_licenses": []
+    },
+    {
+      "coordinate": "io.flutter:flutter_embedding_debug:1.0.0-4d35714800b9266b6693a58e1225ecd7e9e45ed7",
+      "cached_pom_found": true,
+      "declared_licenses": []
+    },
+    {
+      "coordinate": "io.flutter:x86_64_debug:1.0.0-4d35714800b9266b6693a58e1225ecd7e9e45ed7",
+      "cached_pom_found": true,
+      "declared_licenses": []
+    },
+    {
+      "coordinate": "org.jetbrains:annotations:23.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib:2.4.20",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.9.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.7.3",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.3",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.7.3",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "distribution": "repo"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jspecify:jspecify:1.0.0",
+      "cached_pom_found": true,
+      "declared_licenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ]
+    }
+  ],
+  "remaining_checks": [
+    "Flutter SDK subpackage and sky_engine segmented license coverage",
+    "Android AAR/JAR notice coverage including transitive dependencies",
+    "Final signed release APK inventory and notice coverage"
+  ],
+  "release_cleared": false,
+  "sky_engine_section_comparison": {
+    "sections": 1676,
+    "matched": 1670,
+    "unmatched": 6,
+    "note": "Unmatched sections require manual coverage review; segmentation/aggregation can affect comparison."
+  }
+}

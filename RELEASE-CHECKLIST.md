@@ -28,3 +28,23 @@ coordinates are intentional. They are not private network configuration.
 - [ ] Fresh-SD installation acceptance (owner testing in progress).
 - [x] Owner confirmed build 8 LOCATE, rotation, screen-awake and Installed controls.
 - [ ] Repeat prior-helper upgrade on physical hardware with build 4.
+
+## Build 9 dependency audit
+
+`DEPENDENCY-NOTICE-REVIEW.json` binds this review to the debug APK SHA-256.
+The conservative inventory contains 91 Dart packages and 101 Android dependency
+coordinates. Full normalized license texts for 88 Dart entries appear in the APK's
+Flutter notices. Flutter SDK subpackages and sky_engine need separate segmented
+notice verification; a whole-file mismatch is not evidence of an absent license.
+Android POM declarations are recorded, but packaged AAR/JAR notice coverage remains
+open. Repeat the audit against the final signed release APK, which has different
+debug/runtime contents.
+
+- [ ] Integrate the port's recovered web/font/Rust notices into the runtime and app.
+- [ ] Include corresponding source coverage for shipped GCC runtime libraries.
+- [ ] Verify Android transitive notices and Flutter SDK aggregated notices.
+- [ ] Close the remaining Stitch Polaris artwork provenance/redistribution review.
+- [ ] Rebuild and verify the exact final release artifacts after these changes.
+
+No APK or runtime was changed or published by this audit. The port's
+`BINARY-DISTRIBUTION.md` records the source-companion gap and pinned inputs.
