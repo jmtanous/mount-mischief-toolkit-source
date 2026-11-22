@@ -14,7 +14,7 @@
   "debug_validation_layer_absent": true,
   "physical_acceptance": true,
   "key_backup_confirmed": true,
-  "published": false,
+  "published": true,
   "replacement_runtime_build_validated": false,
   "pixel_production_install": "build 11 passed",
   "installed_apk_matches_signed_candidate": true,
@@ -49,5 +49,7 @@
   "known_ui_limitations": [
     "Reinstall requires the exact installed archive cached; an unavailable old version ends the session. Use Catalog Change version for upgrades.",
     "After Stop, the previous connected banner can remain; the refreshed project status correctly shows Stopped. Reconnecting clears the banner."
-  ]
+  ],
+  "release_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/v0.1.0-rc.2",
+  "prerelease": true
 }
