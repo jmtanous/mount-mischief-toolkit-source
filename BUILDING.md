@@ -36,14 +36,27 @@ python3 -B -m unittest discover -s test -p 'test_*.py'
 for local development. Release builds require explicit owner signing credentials and fail if they are
 missing. See [release signing](RELEASE-SIGNING.md). Keep keys out of Git.
 
-## Catalog and OAuth configuration
+## Public catalog configuration
 
-Use `--dart-define=CATALOG_OWNER=...`, `--dart-define=CATALOG_REPO=...`, and
-`--dart-define=GITHUB_CLIENT_ID=...` with a registered GitHub OAuth app supporting
-device flow. A client ID is public configuration; never embed a client secret.
-The existing private-catalog flow requests the GitHub `repo` scope. Tokens are
-stored using Android secure storage. Public-catalog access needs a separate design
-review rather than silently reusing broad private-repository authorization.
+The default public repository is `jmtanous/mount-mischief-toolkit-source`.
+Override it with `--dart-define=CATALOG_OWNER=...` and
+`--dart-define=CATALOG_REPO=...`. No OAuth registration, client ID or token is used.
+Catalog and release-asset requests are anonymous; the repository must be public.
+
+The root `catalog.json` is staged for publication and currently matches the
+bundled Pilot entry, without a remote asset ID. Once reviewed runtime packages
+are uploaded as public release assets in this repository, add their actual
+`asset_id` values while preserving the pinned hashes and sizes. Never substitute
+private-repository asset IDs. Until publication, bundled/cached packages work
+and refresh reports an unavailable public catalog without requiring sign-in.
+
+Updates delete only the retired `github_session` and `github_token` keys.
+Secure storage remains required for SSH pairing identities. The GitHub OAuth
+registration itself is not revoked or changed by this migration.
+
+Release distribution is signed APKs plus checksums on GitHub Releases, not
+Google Play. Production signing, key backup, license review and final artifact
+acceptance remain prerequisites; see RELEASE-CHECKLIST.md.
 
 Verify the runtime, catalog, notices and final APK together with:
 

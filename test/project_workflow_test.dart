@@ -18,8 +18,6 @@ class OfflineCatalog extends Catalog {
   final ProjectManifest project;
   OfflineCatalog(Directory cache, this.project) : super(cacheDirectory: cache);
   @override
-  Future<bool> get signedIn async => false;
-  @override
   Future<List<ProjectManifest>> cached() async => [project];
   @override
   Future<bool> available(ProjectManifest manifest) async => true;

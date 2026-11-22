@@ -1,9 +1,15 @@
-# MMT 0.1.0-rc.1 (build 8) — local candidate
+# MMT 0.1.0-rc.1 (build 9) — local candidate
 
 This is a debug-signed test candidate, not a production release.
 The bundled Alpaca Pilot port remains 0.1.0-rc.1.
 
 ## Changes since build 2
+
+- Removed GitHub authentication. Catalog refresh and downloads are anonymous;
+  migration clears only retired GitHub credentials and preserves SSH pairing,
+  settings and packages. The public catalog is staged locally, not published.
+  Bundled/cached installation remains available offline or before publication.
+- Distribution target is signed APK downloads through GitHub Releases, not Play.
 
 - A dedicated Pilot browser keeps the page/session through rotation, preserves
   screen-awake and safe-area behavior, routes public map/lookups over validated
@@ -31,6 +37,18 @@ The bundled Alpaca Pilot port remains 0.1.0-rc.1.
 
 ## Validation
 
+Build 9: static analysis is clean; all 110 Flutter tests and 16 Android tests
+passed. Coverage includes fresh anonymous refresh, removal of retired credentials
+without deleting pairing/package data, unavailable/rate-limited catalogs,
+credential-free redirects, checksum failures, interrupted downloads and real
+bundled Pilot extraction/verification without network access. Debug APK installed
+on the connected Pixel with application data preserved. Public catalog content
+is staged locally; no catalog or release publication was performed. The live
+Pixel Catalog shows Refresh without sign-in and retains the verified offline
+package after the expected unpublished-catalog response. A final message-only
+cleanup passed all 3 widget tests.
+
+
 Build 8: 16 Android tests and 28 Flutter project-workflow tests passed; Flutter
 analysis is clean. Debug APK installed preserving data. Live Pixel checks confirmed
 map rendering, a fresh native location fix, HTTP 200 and valid payloads from both
@@ -57,6 +75,7 @@ and Stop. Pilot was left stopped. The build 4 compatibility fix was tested throu
 automated regression tests and installed on the Pixel; its old-helper upgrade
 sequence has not been repeated on physical hardware. The runtime is unchanged.
 
+Owner confirmed build 8 LOCATE, rotation, screen-awake and Installed controls.
 Fresh-SD installation testing is in progress with the owner. It is not yet
 accepted. Firmware changes, boot hooks, alignment, tracking and mount motion are
 outside these checks. Standalone port hardware acceptance remains separate.

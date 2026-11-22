@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'benro.dart';
 import 'bluetooth_wake.dart';
@@ -190,7 +189,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
   Set<String> cached = {};
   Benro? device;
   int tab = 0, controllerCount = 0;
-  bool busy = false, signedIn = false, inspected = false;
+  bool busy = false, inspected = false;
   bool setupIncomplete = false;
   bool setupRequired = false;
   bool setupUpdateRequired = false;
@@ -272,7 +271,6 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
 
   String message = 'Download a project, then connect to your device Wi-Fi.';
   String? error;
-  String? loginCode;
   String? catalogNotice;
   @override
   void initState() {
@@ -362,7 +360,6 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     try {
       final prefs = await SharedPreferences.getInstance();
       final list = await catalog.cached();
-      final logged = await catalog.signedIn;
       final ready = <String>{};
       for (final p in list) {
         if (await catalog.available(p)) ready.add(p.hash);
@@ -370,7 +367,6 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
       if (mounted) {
         setState(() {
           projects = list;
-          signedIn = logged;
           cached = ready;
           catalogNotice = catalog.cacheNotice;
           host.text = prefs.getString('device_host') ?? deviceHost;
@@ -400,7 +396,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
       if (mounted) {
         setState(() {
           error = device == null
-              ? e.toString()
+              ? (e is HttpException ? e.message : e.toString())
               : '${device!.describeError(e)}\nLast step: $message';
           if (device != null) {
             clearDeviceSession(preserveStartup: startup?.failure != null);
@@ -419,16 +415,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
           device?.holdingHeartbeat == true,
         );
       } catch (_) {}
-      bool? currentSignIn;
-      try {
-        currentSignIn = await catalog.signedIn;
-      } catch (_) {}
-      if (mounted) {
-        setState(() {
-          busy = false;
-          if (currentSignIn != null) signedIn = currentSignIn;
-        });
-      }
+      if (mounted) setState(() => busy = false);
     }
   }
 
@@ -682,33 +669,6 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
       () => device!.repairSetup(bootstrap),
       toolkitOnly: true,
     );
-  }
-
-  Future<void> signIn() async {
-    await platform.invokeMethod<void>('releaseNetwork');
-    try {
-      await catalog.signIn((code, url) async {
-        if (mounted) setState(() => loginCode = code);
-        progress(
-          'Enter $code at github.com/login/device. Return here after authorizing.',
-        );
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      });
-    } catch (_) {
-      progress('GitHub sign-in did not complete. You can try again.');
-      rethrow;
-    } finally {
-      if (mounted) setState(() => loginCode = null);
-    }
-    if (mounted) {
-      setState(() {
-        signedIn = true;
-        loginCode = null;
-      });
-    }
-    projects = await catalog.refresh();
-    await load();
-    progress('Private catalog refreshed.');
   }
 
   Future<void> download(ProjectManifest p) async {
@@ -1421,40 +1381,18 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
         Text(catalogNotice!),
       ],
       const SizedBox(height: 12),
-      Wrap(
-        children: [
-          if (!signedIn)
-            action('Sign in with GitHub', () => run(signIn), icon: Icons.login),
-          if (signedIn) ...[
-            action(
-              'Refresh catalog',
-              () => run(() async {
-                await platform.invokeMethod<void>('releaseNetwork');
-                final list = await catalog.refresh();
-                setState(() => projects = list);
-                await load();
-              }),
-            ),
-            action(
-              'Sign out',
-              () => run(() async {
-                await catalog.signOut();
-                setState(() => signedIn = false);
-              }),
-            ),
-          ],
-        ],
+      action(
+        'Refresh catalog',
+        () => run(() async {
+          await platform.invokeMethod<void>('releaseNetwork');
+          final list = await catalog.refresh();
+          if (!mounted) return;
+          setState(() => projects = list);
+          await load();
+          progress('Public catalog refreshed.');
+        }),
+        icon: Icons.refresh,
       ),
-      if (loginCode != null) ...[
-        SelectableText('GitHub code: $loginCode'),
-        TextButton(
-          onPressed: () {
-            catalog.cancelled = true;
-            setState(() => loginCode = null);
-          },
-          child: const Text('Cancel sign-in'),
-        ),
-      ],
       for (final p in projects)
         Card(
           child: Padding(

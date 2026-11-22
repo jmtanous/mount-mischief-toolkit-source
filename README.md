@@ -50,9 +50,14 @@ asks whether to preserve settings. Existing unmanaged installations are not adop
 
 See [BUILDING.md](BUILDING.md). The upstream runtime is not committed; an exact
 hash-matching archive must be supplied before Flutter asset builds/tests.
-The current GitHub catalog defaults are invitation-only. Public source access does
-not grant access to that catalog. Configure your own catalog using the documented
-Dart defines, or await a separately prepared public release.
+No GitHub account is required. The public catalog defaults to
+`jmtanous/mount-mischief-toolkit-source`; the root `catalog.json` is prepared for
+publication. Until published, refresh reports that it is unavailable and bundled
+or cached packages remain usable. Upgrading removes old GitHub credentials while
+preserving SSH pairing, preferences and packages.
+
+Distribution will use production-signed APKs through GitHub Releases. Google Play
+submission is outside the current plan. Signing and release checks remain pending.
 
 ## License and credits
 

@@ -18,6 +18,21 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({'github_token': 'test-token'});
   });
   tearDown(() => temp.deleteSync(recursive: true));
+  test('Fresh install extracts and verifies bundled Pilot without any network request', () async {
+    FlutterSecureStorage.setMockInitialValues({});
+    final client = Catalog(
+      cacheDirectory: temp,
+      client: MockClient((request) async {
+        fail('Bundled installation attempted network access: ${request.url}');
+      }),
+    );
+    final seed = (await client.cached()).single;
+    final archive = await client.download(seed, (_, _) {});
+    expect(await archive.length(), seed.bytes);
+    expect(await client.available(seed), isTrue);
+    expect((await client.bootstrap()).path, archive.path);
+    client.close();
+  });
   test(
     'Damaged catalog metadata falls back offline and preserves package files',
     () async {
@@ -75,7 +90,6 @@ void main() {
       ]) {
         FlutterSecureStorage.setMockInitialValues({'github_session': value});
         final client = Catalog(cacheDirectory: temp);
-        expect(await client.signedIn, isFalse);
         expect((await client.cached()).single.id, 'alpaca-pilot');
         expect(await client.storage.read(key: 'github_session'), isNull);
         client.close();
@@ -127,17 +141,125 @@ void main() {
       client.close();
     },
   );
-  test('Catalog 401 clears credentials and keeps cached catalog', () async {
+  for (final status in [401, 403, 404, 429, 503]) {
+    test(
+      'Catalog $status preserves cached data without requiring an account',
+      () async {
+        final client = Catalog(
+          cacheDirectory: temp,
+          client: MockClient((request) async {
+            expect(request.method, 'GET');
+            expect(request.headers.containsKey('Authorization'), isFalse);
+            return http.Response(
+              '',
+              status,
+              headers: {'x-ratelimit-remaining': '0'},
+            );
+          }),
+        );
+        final before = await client.cached();
+        await expectLater(
+          client.refresh(),
+          throwsA(
+            isA<HttpException>().having(
+              (e) => e.message,
+              'message',
+              allOf(contains('cached'), isNot(contains('Sign in'))),
+            ),
+          ),
+        );
+        expect((await client.cached()).single.hash, before.single.hash);
+        client.close();
+      },
+    );
+  }
+
+  test(
+    'Migration deletes only retired GitHub credentials and preserves pairing',
+    () async {
+      FlutterSecureStorage.setMockInitialValues({
+        'github_session': '{"access_token":"old-token"}',
+        'github_token': 'old-token',
+        'ssh_identity_fixture': 'keep',
+      });
+      final client = Catalog(cacheDirectory: temp);
+      final seed = (await client.cached()).single;
+      final file = await client.path(seed);
+      await file.writeAsString('keep package');
+      await client.cached();
+      expect(await client.storage.read(key: 'github_session'), isNull);
+      expect(await client.storage.read(key: 'github_token'), isNull);
+      expect(await client.storage.read(key: 'ssh_identity_fixture'), 'keep');
+      expect(await file.readAsString(), 'keep package');
+      client.close();
+    },
+  );
+
+  test('Public catalog refresh works on a fresh install with no credentials', () async {
+    FlutterSecureStorage.setMockInitialValues({});
+    final content = File('assets/catalog.json').readAsStringSync();
+    var requests = 0;
     final client = Catalog(
       cacheDirectory: temp,
-      client: MockClient((r) async => http.Response('', 401)),
+      client: MockClient((request) async {
+        requests++;
+        expect(request.method, 'GET');
+        expect(
+          request.url.path,
+          '/repos/jmtanous/mount-mischief-toolkit-source/contents/catalog.json',
+        );
+        expect(request.headers.containsKey('Authorization'), isFalse);
+        return http.Response(
+          jsonEncode({'content': base64.encode(utf8.encode(content))}),
+          200,
+        );
+      }),
     );
-    final before = await client.cached();
-    await expectLater(client.refresh(), throwsStateError);
-    expect(await client.signedIn, isFalse);
-    expect((await client.cached()).first.hash, before.first.hash);
+    expect((await client.refresh()).single.id, 'alpaca-pilot');
+    expect(
+      await File('${(await client.directory).path}/catalog.json')
+          .readAsString(),
+      content,
+    );
+    expect(requests, 1);
     client.close();
   });
+
+  test('Offline refresh retains saved catalog and verified package', () async {
+    final payload = utf8.encode('cached archive');
+    final client = Catalog(
+      cacheDirectory: temp,
+      client: MockClient((_) async => throw const SocketException('offline')),
+    );
+    final seed = (await client.cached()).single;
+    final manifest = ProjectManifest({
+      ...seed.json,
+      'sha256': sha256.convert(payload).toString(),
+      'archive_bytes': payload.length,
+    });
+    await (await client.path(manifest)).writeAsBytes(payload);
+    final saved = jsonEncode({
+      'schema': 1,
+      'projects': [manifest.json],
+    });
+    await File('${(await client.directory).path}/catalog.json')
+        .writeAsString(saved);
+    await expectLater(
+      client.refresh(),
+      throwsA(
+        isA<HttpException>().having(
+          (e) => e.message,
+          'message',
+          contains('Check internet'),
+        ),
+      ),
+    );
+    expect((await client.cached()).single.hash, manifest.hash);
+    expect(await client.download(manifest, (_, _) {}), isA<File>());
+    expect(await client.available(manifest), isTrue);
+    client.close();
+  });
+
   test('Malformed catalog does not replace cached data', () async {
     final client = Catalog(
       cacheDirectory: temp,
@@ -162,181 +284,6 @@ void main() {
       throwsFormatException,
     );
   });
-  test('Missing OAuth registration gives actionable setup error', () async {
-    final client = Catalog(cacheDirectory: temp, clientId: '');
-    await expectLater(client.signIn((code, url) async {}), throwsStateError);
-    client.close();
-  });
-  void expiredSession() {
-    FlutterSecureStorage.setMockInitialValues({
-      'github_session': jsonEncode({
-        'access_token': 'expired-test-token',
-        'refresh_token': 'test-refresh',
-        'expires_at': 1,
-      }),
-    });
-  }
-
-  test('Concurrent requests rotate an expired token pair only once', () async {
-    expiredSession();
-    var requests = 0;
-    final response = Completer<http.Response>();
-    final started = Completer<void>();
-    final client = Catalog(
-      client: MockClient((request) async {
-        requests++;
-        expect(
-          request.url.toString(),
-          'https://github.com/login/oauth/access_token',
-        );
-        expect(request.bodyFields, {
-          'client_id': oauthClientId,
-          'grant_type': 'refresh_token',
-          'refresh_token': 'test-refresh',
-        });
-        started.complete();
-        return response.future;
-      }),
-    );
-    final first = client.headers();
-    await started.future;
-    final second = client.headers();
-    response.complete(
-      http.Response(
-        jsonEncode({
-          'access_token': 'rotated-token',
-          'refresh_token': 'rotated-refresh',
-          'expires_in': 28800,
-        }),
-        200,
-      ),
-    );
-    for (final headers in await Future.wait([first, second])) {
-      expect(headers['Authorization'], 'Bearer rotated-token');
-    }
-    expect((await client.headers())['Authorization'], 'Bearer rotated-token');
-    expect(requests, 1);
-    final stored = jsonDecode(
-      (await client.storage.read(key: 'github_session'))!,
-    );
-    expect(stored['refresh_token'], 'rotated-refresh');
-    client.close();
-  });
-
-  test('Rejected refresh clears the entire credential pair', () async {
-    expiredSession();
-    final client = Catalog(
-      client: MockClient(
-        (_) async => http.Response('{"error":"bad_refresh_token"}', 200),
-      ),
-    );
-    await expectLater(client.headers(), throwsStateError);
-    expect(await client.signedIn, isFalse);
-    client.close();
-  });
-
-  test(
-    'Transient refresh failure preserves the credential for retry',
-    () async {
-      expiredSession();
-      final client = Catalog(
-        client: MockClient((_) async => http.Response('', 503)),
-      );
-      await expectLater(client.headers(), throwsA(isA<HttpException>()));
-      expect(await client.signedIn, isTrue);
-      client.close();
-    },
-  );
-
-  test('Sign out during renewal cannot restore credentials', () async {
-    expiredSession();
-    final response = Completer<http.Response>();
-    final started = Completer<void>();
-    final client = Catalog(
-      client: MockClient((_) async {
-        started.complete();
-        return response.future;
-      }),
-    );
-    final pending = expectLater(client.headers(), throwsStateError);
-    await started.future;
-    await client.signOut();
-    response.complete(http.Response('{"access_token":"late-token"}', 200));
-    await pending;
-    expect(await client.signedIn, isFalse);
-    client.close();
-  });
-  test('OAuth honors pending and slow-down before storing token', () async {
-    var polls = 0;
-    final delays = <int>[];
-    final client = Catalog(
-      cacheDirectory: temp,
-      clientId: 'registered-app',
-      delay: (duration) async {
-        delays.add(duration.inSeconds);
-      },
-      client: MockClient((request) async {
-        if (request.url.path == '/login/device/code') {
-          expect(request.bodyFields['scope'], 'repo');
-          return http.Response(
-            jsonEncode({
-              'device_code': 'fake-code',
-              'user_code': 'ABCD-EFGH',
-              'verification_uri': 'https://github.com/login/device',
-              'expires_in': 300,
-              'interval': 5,
-            }),
-            200,
-          );
-        }
-        polls++;
-        return http.Response(
-          jsonEncode(
-            polls == 1
-                ? {'error': 'authorization_pending'}
-                : polls == 2
-                ? {'error': 'slow_down'}
-                : {'access_token': 'new-test-token'},
-          ),
-          200,
-        );
-      }),
-    );
-    await client.signIn((code, url) async {
-      expect(code, 'ABCD-EFGH');
-      expect(url.host, 'github.com');
-    });
-    expect(delays, [5, 5, 10]);
-    expect((await client.headers())['Authorization'], 'Bearer new-test-token');
-    client.close();
-  });
-  test('Denied OAuth does not store a new credential', () async {
-    FlutterSecureStorage.setMockInitialValues({});
-    final client = Catalog(
-      cacheDirectory: temp,
-      clientId: 'registered-app',
-      delay: (_) async {},
-      client: MockClient(
-        (request) async => http.Response(
-          jsonEncode(
-            request.url.path == '/login/device/code'
-                ? {
-                    'device_code': 'fake-code',
-                    'user_code': 'CODE',
-                    'verification_uri': 'https://github.com/login/device',
-                    'expires_in': 300,
-                    'interval': 5,
-                  }
-                : {'error': 'access_denied'},
-          ),
-          200,
-        ),
-      ),
-    );
-    await expectLater(client.signIn((code, url) async {}), throwsStateError);
-    expect(await client.signedIn, isFalse);
-    client.close();
-  });
   test('Asset redirect never forwards GitHub credentials', () async {
     final payload = utf8.encode('package');
     var requests = 0;
@@ -345,7 +292,8 @@ void main() {
       client: MockClient((request) async {
         requests++;
         if (request.url.host == 'api.github.com') {
-          expect(request.headers['Authorization'], 'Bearer test-token');
+          expect(request.headers.containsKey('Authorization'), isFalse);
+          expect(request.method, 'GET');
           return http.Response(
             '',
             302,
@@ -472,14 +420,41 @@ void main() {
     );
   }
 
-  test(
-    'Revoked authorization during asset download requires sign-in again',
-    () async {
+  test('Unavailable public asset preserves the cached catalog', () async {
+    final client = Catalog(
+      cacheDirectory: temp,
+      client: MockClient((_) async => http.Response('', 404)),
+    );
+    final seed = (await client.cached()).single;
+    await expectLater(
+      client.download(
+        ProjectManifest({...seed.json, 'asset_id': 1}),
+        (_, _) {},
+      ),
+      throwsA(
+        isA<HttpException>().having(
+          (e) => e.message,
+          'message',
+          contains('not available for public download'),
+        ),
+      ),
+    );
+    expect((await client.cached()).single.hash, seed.hash);
+    client.close();
+  });
+
+  for (final redirect in [
+    'http://example.com/package',
+    'https://user:password@example.com/package',
+  ]) {
+    test('Reject unsafe public download redirect $redirect', () async {
       final client = Catalog(
         cacheDirectory: temp,
-        client: MockClient((_) async => http.Response('', 401)),
+        client: MockClient(
+          (_) async => http.Response('', 302, headers: {'location': redirect}),
+        ),
       );
-      final seed = (await client.cached()).first;
+      final seed = (await client.cached()).single;
       await expectLater(
         client.download(
           ProjectManifest({...seed.json, 'asset_id': 1}),
@@ -487,9 +462,7 @@ void main() {
         ),
         throwsStateError,
       );
-      expect(await client.signedIn, isFalse);
-      expect((await client.cached()).single.hash, seed.hash);
       client.close();
-    },
-  );
+    });
+  }
 }

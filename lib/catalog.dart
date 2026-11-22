@@ -16,216 +16,69 @@ const catalogOwner = String.fromEnvironment(
 );
 const catalogRepo = String.fromEnvironment(
   'CATALOG_REPO',
-  defaultValue: 'mount-mischief-catalog',
-);
-const oauthClientId = String.fromEnvironment(
-  'GITHUB_CLIENT_ID',
-  defaultValue: 'Ov23liMDXJ4LuW3hjHWP',
+  defaultValue: 'mount-mischief-toolkit-source',
 );
 
 class Catalog {
   final storage = const FlutterSecureStorage();
   final http.Client _client;
   final Directory? cacheDirectory;
-  final String clientId;
-  final Future<void> Function(Duration) delay;
-  bool cancelled = false;
-  int _authGeneration = 0;
-  Future<Map<String, dynamic>>? _refreshing;
+  bool _credentialsRemoved = false;
   String? cacheNotice;
-  Catalog({
-    http.Client? client,
-    this.cacheDirectory,
-    this.clientId = oauthClientId,
-    Future<void> Function(Duration)? delay,
-  }) : _client = client ?? http.Client(),
-       delay = delay ?? Future<void>.delayed;
+  Catalog({http.Client? client, this.cacheDirectory})
+    : _client = client ?? http.Client();
+
+  // Retain secure storage for SSH pairing; delete only retired GitHub keys.
+  Future<void> removeLegacyCredentials() async {
+    if (_credentialsRemoved) return;
+    try {
+      await storage.delete(key: 'github_session');
+      await storage.delete(key: 'github_token');
+      _credentialsRemoved = true;
+    } on PlatformException {
+      cacheNotice = 'Old sign-in data could not be cleared. It is no longer used; cleanup will retry when the catalog reloads.';
+    }
+  }
+
+  void close() => _client.close();
+
+  String unavailable(String subject, int status, Map<String, String> headers) {
+    if (status == 429 ||
+        (status == 403 && headers['x-ratelimit-remaining'] == '0')) {
+      return '$subject refresh/download limit reached. Try again later. Bundled and cached projects remain available.';
+    }
+    if (status == 404) {
+      return '$subject is not available for public download yet. Bundled and cached projects remain available.';
+    }
+    return '$subject unavailable ($status). Try again later. Bundled and cached projects remain available.';
+  }
+
+  Future<T> internetRequest<T>(Future<T> Function() request) async {
+    try {
+      return await request();
+    } on SocketException {
+      throw const HttpException(
+        'Could not connect. Check internet access; bundled and cached projects remain available.',
+      );
+    } on http.ClientException {
+      throw const HttpException(
+        'Could not connect. Check internet access; bundled and cached projects remain available.',
+      );
+    } on TimeoutException {
+      throw const HttpException(
+        'Request timed out. Check internet access and retry; bundled and cached projects remain available.',
+      );
+    }
+  }
+
   Future<Directory> get directory async {
     final root = cacheDirectory ?? await getApplicationSupportDirectory();
     return Directory('${root.path}/packages')..createSync(recursive: true);
   }
 
-  Future<Map<String, dynamic>?> _session() async {
-    final value = await storage.read(key: 'github_session');
-    if (value != null) {
-      try {
-        final decoded = jsonDecode(value);
-        if (decoded is! Map<String, dynamic> ||
-            decoded['access_token'] is! String ||
-            (decoded['access_token'] as String).isEmpty ||
-            (decoded['refresh_token'] != null &&
-                decoded['refresh_token'] is! String) ||
-            (decoded['expires_at'] != null && decoded['expires_at'] is! int)) {
-          throw const FormatException('Invalid saved session');
-        }
-        return decoded;
-      } on FormatException {
-        await storage.delete(key: 'github_session');
-        await storage.delete(key: 'github_token');
-        return null;
-      }
-    }
-    final legacy = await storage.read(key: 'github_token');
-    return legacy == null ? null : {'access_token': legacy};
-  }
-
-  Future<bool> get signedIn async => await _session() != null;
-  Future<void> signOut() async {
-    cancelled = true;
-    _authGeneration++;
-    await storage.delete(key: 'github_session');
-    await storage.delete(key: 'github_token');
-  }
-
-  void close() {
-    cancelled = true;
-    _authGeneration++;
-    _client.close();
-  }
-
-  Future<Map<String, dynamic>> _saveSession(
-    Map<String, dynamic> result,
-    int generation,
-  ) async {
-    if (generation != _authGeneration) throw StateError('Sign-in cancelled');
-    if (result['access_token'] is! String ||
-        (result['access_token'] as String).isEmpty) {
-      throw const FormatException('GitHub did not return an access token');
-    }
-    final session = <String, dynamic>{
-      'access_token': result['access_token'],
-      if (result['refresh_token'] is String)
-        'refresh_token': result['refresh_token'],
-      if (result['expires_in'] is num)
-        'expires_at':
-            DateTime.now().millisecondsSinceEpoch +
-            (result['expires_in'] as num).toInt() * 1000,
-    };
-    // One secure-storage value keeps rotating token pairs together.
-    await storage.write(key: 'github_session', value: jsonEncode(session));
-    await storage.delete(key: 'github_token');
-    return session;
-  }
-
-  Future<Map<String, dynamic>> _renew(Map<String, dynamic> session) async {
-    final generation = _authGeneration;
-    final refresh = session['refresh_token'];
-    if (refresh is! String || refresh.isEmpty) {
-      await signOut();
-      throw StateError('GitHub authorization expired. Sign in again.');
-    }
-    final result = await post('/login/oauth/access_token', {
-      'client_id': clientId,
-      'grant_type': 'refresh_token',
-      'refresh_token': refresh,
-    });
-    if (generation != _authGeneration) throw StateError('Sign-in cancelled');
-    if (result['error'] != null) {
-      if (result['error'] == 'bad_refresh_token') await signOut();
-      throw StateError('GitHub could not renew authorization. Sign in again.');
-    }
-    return _saveSession(result, generation);
-  }
-
-  Future<Map<String, dynamic>> post(
-    String path,
-    Map<String, String> fields,
-  ) async {
-    final response = await _client
-        .post(
-          Uri.https('github.com', path),
-          headers: {'Accept': 'application/json'},
-          body: fields,
-        )
-        .timeout(const Duration(seconds: 25));
-    if (response.statusCode != 200) {
-      throw HttpException(
-        'GitHub authorization failed (${response.statusCode})',
-      );
-    }
-    return jsonDecode(response.body) as Map<String, dynamic>;
-  }
-
-  Future<void> signIn(
-    Future<void> Function(String code, Uri url) showCode,
-  ) async {
-    if (clientId.isEmpty) {
-      throw StateError(
-        'This build needs a registered GitHub OAuth client ID. See setup documentation.',
-      );
-    }
-    cancelled = false;
-    final generation = ++_authGeneration;
-    final device = await post('/login/device/code', {
-      'client_id': clientId,
-      'scope': 'repo',
-    });
-    if (device['error'] != null) {
-      throw StateError(
-        device['error_description']?.toString() ?? device['error'].toString(),
-      );
-    }
-    final url = Uri.parse(device['verification_uri'] as String);
-    if (url.scheme != 'https' || url.host != 'github.com') {
-      throw StateError('Unexpected authorization address');
-    }
-    await showCode(device['user_code'] as String, url);
-    var interval = (device['interval'] as num? ?? 5).toInt();
-    final deadline = DateTime.now().add(
-      Duration(seconds: (device['expires_in'] as num).toInt()),
-    );
-    while (!cancelled && DateTime.now().isBefore(deadline)) {
-      await delay(Duration(seconds: interval));
-      if (cancelled) break;
-      final result = await post('/login/oauth/access_token', {
-        'client_id': clientId,
-        'device_code': device['device_code'] as String,
-        'grant_type': 'urn:ietf:params:oauth:grant-type:device_code',
-      });
-      if (cancelled) break;
-      if (result['access_token'] != null) {
-        await _saveSession(result, generation);
-        return;
-      }
-      switch (result['error']) {
-        case 'authorization_pending':
-          continue;
-        case 'slow_down':
-          interval += 5;
-          continue;
-        default:
-          throw StateError(
-            result['error_description']?.toString() ??
-                'GitHub sign-in expired or was denied',
-          );
-      }
-    }
-    throw StateError(cancelled ? 'Sign-in cancelled' : 'Sign-in expired');
-  }
-
-  Future<Map<String, String>> headers() async {
-    var session = await _session();
-    if (session == null) {
-      throw StateError('Sign in to GitHub to refresh the catalog');
-    }
-    final expires = session['expires_at'] as int?;
-    if (expires != null &&
-        DateTime.now().millisecondsSinceEpoch + 30000 >= expires) {
-      final renewal = _refreshing ??= _renew(session);
-      try {
-        session = await renewal;
-      } finally {
-        if (identical(_refreshing, renewal)) _refreshing = null;
-      }
-    }
-    return {
-      'Authorization': 'Bearer ${session['access_token']}',
-      'Accept': 'application/vnd.github+json',
-    };
-  }
-
   Future<List<ProjectManifest>> cached() async {
     cacheNotice = null;
+    await removeLegacyCredentials();
     final file = File('${(await directory).path}/catalog.json');
     if (await file.exists()) {
       try {
@@ -260,20 +113,19 @@ class Catalog {
   }
 
   Future<List<ProjectManifest>> refresh() async {
+    await removeLegacyCredentials();
     final uri = Uri.https(
       'api.github.com',
       '/repos/$catalogOwner/$catalogRepo/contents/catalog.json',
     );
-    final response = await _client
-        .get(uri, headers: await headers())
-        .timeout(const Duration(seconds: 25));
-    if (response.statusCode == 401) {
-      await signOut();
-      throw StateError('GitHub authorization expired. Sign in again.');
-    }
+    final response = await internetRequest<http.Response>(
+      () => _client
+          .get(uri, headers: {'Accept': 'application/vnd.github+json'})
+          .timeout(const Duration(seconds: 25)),
+    );
     if (response.statusCode != 200) {
       throw HttpException(
-        'Catalog unavailable (${response.statusCode}). Check repository access. Cached packages remain available.',
+        unavailable('Catalog', response.statusCode, response.headers),
       );
     }
     final envelope = jsonDecode(response.body) as Map;
@@ -348,16 +200,16 @@ class Catalog {
       'api.github.com',
       '/repos/$catalogOwner/$catalogRepo/releases/assets/${m.assetId}',
     );
-    var auth = await headers();
-    auth['Accept'] = 'application/octet-stream';
+    await removeLegacyCredentials();
+    const requestHeaders = {'Accept': 'application/octet-stream'};
     http.StreamedResponse? response;
     for (var i = 0; i < 5; i++) {
       final request = http.Request('GET', uri)
         ..followRedirects = false
-        ..headers.addAll(auth);
-      response = await _client
-          .send(request)
-          .timeout(const Duration(seconds: 30));
+        ..headers.addAll(requestHeaders);
+      response = await internetRequest<http.StreamedResponse>(
+        () => _client.send(request).timeout(const Duration(seconds: 30)),
+      );
       if (response.statusCode == 200) break;
       if ([301, 302, 303, 307, 308].contains(response.statusCode)) {
         final location = response.headers['location'];
@@ -370,9 +222,6 @@ class Catalog {
         if (next.scheme != 'https' || next.userInfo.isNotEmpty) {
           throw StateError('Unsafe download redirect');
         }
-        if (next.origin != uri.origin) {
-          auth = {}; // Never forward the GitHub token to asset storage.
-        }
         uri = next;
         response = null;
         continue;
@@ -381,11 +230,9 @@ class Catalog {
           .listen((_) {})
           .cancel()
           .timeout(const Duration(seconds: 30));
-      if (response.statusCode == 401 && auth.containsKey('Authorization')) {
-        await signOut();
-        throw StateError('GitHub authorization expired. Sign in again.');
-      }
-      throw HttpException('Package download failed (${response.statusCode})');
+      throw HttpException(
+        unavailable('Package', response.statusCode, response.headers),
+      );
     }
     if (response == null || response.statusCode != 200) {
       throw StateError('Too many download redirects');
