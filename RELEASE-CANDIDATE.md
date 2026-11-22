@@ -1,7 +1,10 @@
-# MMT 0.1.0-rc.1 (build 9) — local candidate
+# MMT 0.1.0-rc.2 (build 11) — local signed candidate
 
-This is a debug-signed test candidate, not a production release.
-The bundled Alpaca Pilot port remains 0.1.0-rc.1.
+This is a locally production-signed experimental release candidate, not a published
+release. The bundled Alpaca Pilot port is 0.1.0-rc.2. Build 11 reads the installed
+version/build number in About and Licenses instead of using a hard-coded label.
+RELEASE-VALIDATION.json records exact artifacts and test scope. Earlier build
+history below is retained for context.
 
 ## Changes since build 2
 
@@ -94,3 +97,28 @@ outside these checks. Standalone port hardware acceptance remains separate.
 
 Local source commits do not publish binaries, change catalog access or authorize
 final release upload. No production APK or public installable release is claimed.
+
+## Build 10 / runtime rc.2 notice update
+
+Build 10 includes all 237 recovered web/font/Rust notices in runtime rc.2 and
+MMT's license screen, plus explicit Android artifact notices and complete Flutter
+SDK/engine license text. Only two existing runtime notice documents changed;
+4,361 existing runtime files are byte-identical and 237 notice files were added.
+The manifest, catalog and bootstrap pins were updated together.
+
+Validation: static analysis clean, 110 Flutter tests pass, exact debug APK asset
+verification passes, and two independent runtime repacks produce identical bytes.
+The source companion includes pinned GCC source and its applied patch; altered
+patch input is rejected. Public Debian SDK inputs, a clean GCC rebuild, actual
+replacement-library loading and numeric/cryptography operations pass under ARM
+QEMU. Modified certifi and pure-Python zeroconf checks also pass on ARM. A clean
+cross-build of the entire port and physical testing of newly rebuilt dependencies
+remain separate; those experimental libraries are not included in this runtime.
+
+The Stitch provenance receipt matches the shipped chooser image; ARTWORK.md now
+records that evidence. The owner authorized production-key creation and migration
+of the Pixel from the debug signer. The signed build was installed and its installed
+APK hash matched the verified candidate. No mount SD/firmware changes or publication
+occurred. Secure key backup and final mount workflow acceptance remain pending.
+Public account-free catalog
+access is already selected; no GitHub sign-in is required.

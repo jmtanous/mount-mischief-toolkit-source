@@ -61,7 +61,8 @@ with tarfile.open(archive) as tar:
 if args.apk:
     with zipfile.ZipFile(args.apk) as apk:
         for relative in ['assets/runtime/pilot.tar.gz', 'assets/catalog.json',
-                         'assets/legal/runtime-licenses.json', 'assets/branding/bandaged-mount.png']:
+                         'assets/legal/runtime-licenses.json', 'assets/legal/platform-licenses.json',
+                         'assets/branding/bandaged-mount.png']:
             if apk.read('assets/flutter_assets/'+relative) != (root/relative).read_bytes():
                 raise SystemExit('APK contains stale asset: '+relative)
 print(json.dumps({'result': 'passed', 'runtime_sha256': sha,

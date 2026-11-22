@@ -37,13 +37,18 @@ void main() {
         entry.key,
       ], await rootBundle.loadString(entry.value));
     }
-    final notices = jsonDecode(
-      await rootBundle.loadString('assets/legal/runtime-licenses.json'),
-    ) as Map;
-    for (final entry in (notices['files'] as Map).entries) {
-      yield LicenseEntryWithLineBreaks([
-        'Alpaca Pilot runtime: ${entry.key}',
-      ], entry.value as String);
+    for (final registry in {
+      'Alpaca Pilot runtime': 'assets/legal/runtime-licenses.json',
+      'Android and Flutter': 'assets/legal/platform-licenses.json',
+    }.entries) {
+      final notices = jsonDecode(
+        await rootBundle.loadString(registry.value),
+      ) as Map;
+      for (final entry in (notices['files'] as Map).entries) {
+        yield LicenseEntryWithLineBreaks([
+          '${registry.key}: ${entry.key}',
+        ], entry.value as String);
+      }
     }
     for (final family in ['RedHatDisplay', 'RadioCanadaBig']) {
       yield LicenseEntryWithLineBreaks([

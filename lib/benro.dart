@@ -16,7 +16,7 @@ import 'package:flutter/services.dart';
 
 const deviceHost = '192.168.0.1';
 const bundleHash =
-    'dae7501b5a97ff3bcf0840496a724fc3e75c1c8b3747832651938373989a2b2d';
+    '30d34031d479505ce3f05a9cdabc6264f231ed7a2aec029edb0fff11c4467f1d';
 const toolkitBase = '/app/sd/mount-mischief-toolkit';
 String quote(String s) => "'${s.replaceAll("'", "'\\''")}'";
 

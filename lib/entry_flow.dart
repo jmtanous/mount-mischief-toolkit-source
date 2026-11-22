@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 const communityNotice =
     'Independent community project. Not affiliated with or endorsed by Benro.';
@@ -404,6 +405,30 @@ class MountIllustration extends StatelessWidget {
   );
 }
 
+Future<String?> installedToolkitVersion() async {
+  try {
+    final info = await PackageInfo.fromPlatform();
+    return '${info.version} (${info.buildNumber})';
+  } on PlatformException {
+    return null;
+  } on MissingPluginException {
+    return null;
+  }
+}
+
+class InstalledToolkitVersion extends StatelessWidget {
+  const InstalledToolkitVersion({super.key});
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<String?>(
+    future: installedToolkitVersion(),
+    builder: (context, snapshot) => Text(
+      snapshot.hasData ? 'Version ${snapshot.data}' : 'Version unavailable',
+      style: const TextStyle(fontSize: 12, color: Color(0xff938ea1)),
+    ),
+  );
+}
+
 class ToolkitAbout extends StatelessWidget {
   const ToolkitAbout({super.key});
   @override
@@ -430,10 +455,7 @@ class ToolkitAbout extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 4),
-                    Text(
-                      'Version 0.1.0',
-                      style: TextStyle(fontSize: 12, color: Color(0xff938ea1)),
-                    ),
+                    InstalledToolkitVersion(),
                   ],
                 ),
               ),
@@ -469,11 +491,15 @@ class ToolkitAbout extends StatelessWidget {
             child: ListTile(
               title: const Text('Open-source licenses'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => showLicensePage(
-                context: context,
-                applicationName: 'Mount Mischief Toolkit',
-                applicationVersion: '0.1.0',
-              ),
+              onTap: () async {
+                final version = await installedToolkitVersion();
+                if (!context.mounted) return;
+                showLicensePage(
+                  context: context,
+                  applicationName: 'Mount Mischief Toolkit',
+                  applicationVersion: version,
+                );
+              },
             ),
           ),
           const SizedBox(height: 24),

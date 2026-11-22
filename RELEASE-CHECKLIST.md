@@ -40,11 +40,15 @@ Android POM declarations are recorded, but packaged AAR/JAR notice coverage rema
 open. Repeat the audit against the final signed release APK, which has different
 debug/runtime contents.
 
-- [ ] Integrate the port's recovered web/font/Rust notices into the runtime and app.
-- [ ] Include corresponding source coverage for shipped GCC runtime libraries.
-- [ ] Verify Android transitive notices and Flutter SDK aggregated notices.
-- [ ] Close the remaining Stitch Polaris artwork provenance/redistribution review.
+- [x] Integrate the port's recovered web/font/Rust notices into the runtime and app.
+- [x] Include pinned GCC source and applied patch; full replacement build remains open.
+- [x] Package Android artifact notices and complete Flutter SDK notices in build 10.
+- [x] Repeat notice/asset coverage checks against the signed release variant.
+- [x] Match the bundled Stitch image to its original live-design provenance receipt.
 - [ ] Rebuild and verify the exact final release artifacts after these changes.
 
 No APK or runtime was changed or published by this audit. The port's
 `BINARY-DISTRIBUTION.md` records the source-companion gap and pinned inputs.
+
+Build 10 supersedes the build 9 packaging gaps above; see RELEASE-CANDIDATE.md
+and RELEASE-VALIDATION.json. The original build 9 report is retained as audit evidence.

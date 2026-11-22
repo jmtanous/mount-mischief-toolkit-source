@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:mount_mischief_toolkit/entry_flow.dart';
 import 'package:mount_mischief_toolkit/main.dart' show toolkitTheme;
 
@@ -108,6 +109,13 @@ void main() {
   testWidgets(
     'About support and licenses work with large text on a small phone',
     (tester) async {
+      PackageInfo.setMockInitialValues(
+        appName: 'Mount Mischief Toolkit',
+        packageName: 'org.mountmischief.mount_mischief_toolkit',
+        version: '0.1.0-rc.2',
+        buildNumber: '11',
+        buildSignature: '',
+      );
       tester.view.physicalSize = const Size(320, 640);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -124,6 +132,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      expect(find.text('Version 0.1.0-rc.2 (11)'), findsOneWidget);
       await scrollTo(tester, 'Buy me a beer');
       expect(
         tester
@@ -138,6 +147,7 @@ void main() {
       await tester.tap(find.text('Open-source licenses'));
       await tester.pumpAndSettle();
       expect(find.text('Licenses'), findsOneWidget);
+      expect(find.text('0.1.0-rc.2 (11)'), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.text('About & support'), findsOneWidget);
