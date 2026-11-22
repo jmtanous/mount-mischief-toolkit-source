@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 
-/** Apply the saved screen preference to url_launcher's separate Pilot window. */
+/** Apply MMT's window behavior to url_launcher's separate Pilot window. */
 class ToolkitApplication : Application(), Application.ActivityLifecycleCallbacks {
     override fun onCreate() {
         super.onCreate()
@@ -23,7 +23,9 @@ class ToolkitApplication : Application(), Application.ActivityLifecycleCallbacks
     }
 
     override fun onActivityCreated(activity: Activity, state: Bundle?) {}
-    override fun onActivityStarted(activity: Activity) {}
+    override fun onActivityStarted(activity: Activity) {
+        if (isPilotBrowser(activity)) PilotBrowserInsets.apply(activity)
+    }
     override fun onActivityStopped(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, state: Bundle) {}
     override fun onActivityDestroyed(activity: Activity) {}

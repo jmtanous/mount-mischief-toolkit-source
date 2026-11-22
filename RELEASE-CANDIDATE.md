@@ -1,9 +1,13 @@
-# MMT 0.1.0-rc.1 (build 6) — local candidate
+# MMT 0.1.0-rc.1 (build 7) — local candidate
 
 This is a debug-signed test candidate, not a production release.
 The bundled Alpaca Pilot port remains 0.1.0-rc.1.
 
 ## Changes since build 2
+
+- Pilot browser content now stays above Android navigation controls and clear of
+  display cutouts and the keyboard. The Multi Point Alignment row was verified
+  fully visible at the bottom of the Connection page on the connected Pixel.
 
 - Keep screen awake now also applies to the embedded Pilot browser and releases
   when that window goes into the background. Android lifecycle regression tests
@@ -20,6 +24,12 @@ The bundled Alpaca Pilot port remains 0.1.0-rc.1.
 - The approved clay icon and “It worked before I touched it.” motto remain.
 
 ## Validation
+
+Build 7: all 11 Android tests passed, including browser viewport sizing across
+resume, navigation inset changes and keyboard visibility. Debug APK built and
+installed preserving app data. Attended visual check confirmed the entire Multi
+Point Alignment label and ALIGN button above the navigation bar. No alignment
+or movement actions were invoked.
 
 Build 5: Flutter analysis and 108 Flutter tests passed. The helper suite has 37
 passing tests. The APK release-input check passes against the pinned FAT runtime,
