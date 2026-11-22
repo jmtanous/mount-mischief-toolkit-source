@@ -1,10 +1,33 @@
-# MMT 0.1.0-rc.2 (build 11) — local signed candidate
+# MMT 0.1.0-rc.2 (build 11) — experimental release candidate
 
-This is a locally production-signed experimental release candidate, not a published
-release. The bundled Alpaca Pilot port is 0.1.0-rc.2. Build 11 reads the installed
+This is a production-signed experimental release candidate. The bundled Alpaca Pilot port is 0.1.0-rc.2. Build 11 reads the installed
 version/build number in About and Licenses instead of using a hard-coded label.
 RELEASE-VALIDATION.json records exact artifacts and test scope. Earlier build
 history below is retained for context.
+
+## Final build 11 acceptance
+
+The exact signed APK and rc.2 runtime passed an attended existing-SD upgrade,
+Toolkit helper update, all 4,600 installed-file checks, saved observing-site
+retention, startup/controller connection, live Pilot webpage, Stop, and reconnect.
+Pilot was left stopped. Bluetooth wake passed; Wi-Fi association was selected with
+ADB during this acceptance session, not automatic joining by MMT. No firmware,
+boot, alignment, slew or tracking actions were performed.
+
+The signing backup is verified. The signed APK, runtime and corresponding source
+companion hashes are frozen in RELEASE-VALIDATION.json and the release checksums.
+Notices, artwork provenance and signed-APK asset coverage have been reviewed.
+The owner authorized experimental GitHub prerelease publication after these tests.
+
+Fresh-SD and standalone-launcher physical acceptance remain open; a complete clean
+cross-build of every port dependency is not claimed. These limits are explicit in
+the experimental download notes. Earlier preparation entries below are historical;
+this section and RELEASE-VALIDATION.json describe the final candidate.
+
+Known UI limitations: an unavailable old-version Reinstall ends the session; use
+Catalog → Change version with a verified package for upgrades. After Stop, the
+previous connected banner can remain, although the project card correctly shows
+Stopped; reconnecting clears it.
 
 ## Changes since build 2
 

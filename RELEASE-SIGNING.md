@@ -19,7 +19,7 @@ on the exact APK. Record the certificate SHA-256 fingerprint with the release an
 compare it with the owner's expected release certificate. A successful signature
 check alone does not establish that the correct key was used.
 
-The current Pixel installation uses the debug signer. Android will reject an
+Development installations use the debug signer. Android will reject an
 in-place update signed with a different production key. Plan the migration and
 preserve needed app settings before uninstalling the debug build; no automatic
 uninstall or data clearing is performed by these build scripts.
@@ -29,6 +29,6 @@ certificate SHA-256 is
 `868c4b51f7da0e23fb0277149fefac96808e37e42852219e5264d00f1b61fa68`.
 The encrypted PKCS12 keystore and password are stored outside the repositories
 with owner-only filesystem permissions. No private key or password is committed.
-An independent secure backup has not yet been confirmed and remains required
-before publication. Generating a key does not authorize publishing a release or
-uninstalling the debug app.
+An independent owner-requested backup was completed and verified before publication.
+The test Pixel has been migrated, with owner approval, to production-signed build 11.
+Generating a key alone does not authorize publishing a release or uninstalling an app.

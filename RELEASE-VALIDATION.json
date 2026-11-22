@@ -12,8 +12,8 @@
   "android_artifacts_recorded": 88,
   "full_engine_license_included": true,
   "debug_validation_layer_absent": true,
-  "physical_acceptance": false,
-  "key_backup_confirmed": false,
+  "physical_acceptance": true,
+  "key_backup_confirmed": true,
   "published": false,
   "replacement_runtime_build_validated": false,
   "pixel_production_install": "build 11 passed",
@@ -28,5 +28,26 @@
   "flutter_tests_passed_before_version_label_fix": 110,
   "license_page_installed_version_verified": true,
   "license_list_opened_on_pixel": true,
-  "source_companion_sha256": "7773e6206a5018c436875a8956804e46f3187ff9fea81b7e6dbe4c712a78b518"
+  "source_companion_sha256": "7773e6206a5018c436875a8956804e46f3187ff9fea81b7e6dbe4c712a78b518",
+  "physical_checks": {
+    "existing_sd_upgrade_to_rc2": "passed",
+    "toolkit_helper_update": "passed",
+    "installed_files_verified": 4600,
+    "saved_observing_site_retained": true,
+    "bluetooth_wifi_wake": "passed",
+    "wifi_association_method": "ADB selected saved network",
+    "ssh_pairing": "passed",
+    "fresh_sd_install": "not tested in this acceptance session",
+    "startup_and_controller_connection": "passed",
+    "pilot_webpage_live_status": "passed",
+    "stop": "passed",
+    "disconnect_and_reconnect": "passed",
+    "final_pilot_state": "stopped",
+    "motion_or_firmware_changes": false
+  },
+  "physical_acceptance_scope": "Existing-SD MMT-managed upgrade and non-motion workflow only",
+  "known_ui_limitations": [
+    "Reinstall requires the exact installed archive cached; an unavailable old version ends the session. Use Catalog Change version for upgrades.",
+    "After Stop, the previous connected banner can remain; the refreshed project status correctly shows Stopped. Reconnecting clears the banner."
+  ]
 }

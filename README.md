@@ -4,8 +4,9 @@ An independent Android app for managing projects on compatible field hardware.
 The initial target is Benro Polaris, with Alpaca Pilot 2.2 Beta 8 support.
 Not affiliated with or endorsed by Benro or oGecko Solutions.
 
-**Experimental source preview.** Signed public downloads are not available in this
-snapshot. Review the [release checklist](RELEASE-CHECKLIST.md) before distribution.
+**Experimental release candidate.** Get the production-signed APK from
+[GitHub Releases](https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/v0.1.0-rc.2).
+Read the [tested scope and known limitations](RELEASE-CANDIDATE.md).
 
 ## What it does
 
@@ -51,13 +52,12 @@ asks whether to preserve settings. Existing unmanaged installations are not adop
 See [BUILDING.md](BUILDING.md). The upstream runtime is not committed; an exact
 hash-matching archive must be supplied before Flutter asset builds/tests.
 No GitHub account is required. The public catalog defaults to
-`jmtanous/mount-mischief-toolkit-source`; the root `catalog.json` is prepared for
-publication. Until published, refresh reports that it is unavailable and bundled
-or cached packages remain usable. Upgrading removes old GitHub credentials while
+`jmtanous/mount-mischief-toolkit-source`; the root `catalog.json` lists the released package. Bundled or cached packages
+remain usable without internet. Upgrading removes old GitHub credentials while
 preserving SSH pairing, preferences and packages.
 
-Distribution will use production-signed APKs through GitHub Releases. Google Play
-submission is outside the current plan. Signing and release checks remain pending.
+Distribution uses production-signed APKs through GitHub Releases. Google Play
+submission is outside the current plan.
 
 ## License and credits
 
