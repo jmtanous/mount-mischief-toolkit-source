@@ -1,9 +1,12 @@
-# MMT 0.1.0-rc.1 (build 4) — local candidate
+# MMT 0.1.0-rc.1 (build 5) — local candidate
 
 This is a debug-signed test candidate, not a production release.
 The bundled Alpaca Pilot port remains 0.1.0-rc.1.
 
 ## Changes since build 2
+
+- Fresh SD cards show “Connected · setup needed,” explain automatic Toolkit setup,
+  and link directly to Catalog. Catalog explains that Install sets up Toolkit first.
 
 - Toolkit setup and package installation show a checklist, transfer bytes,
   unpacking and verification counts, and completion or failure states.
@@ -14,7 +17,7 @@ The bundled Alpaca Pilot port remains 0.1.0-rc.1.
 
 ## Validation
 
-Build 4: Flutter analysis and 106 Flutter tests passed. The helper suite has 37
+Build 5: Flutter analysis and 108 Flutter tests passed. The helper suite has 37
 passing tests. The APK release-input check passes against the pinned FAT runtime,
 4,363 manifest files and 113 retained runtime notices. The compatibility tests
 cover the exact prior helper set, altered/missing sets and Stop followed by update.

@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mount_mischief_toolkit/benro.dart';
 
 class UpgradeDevice extends Benro {
-  bool runtime = true, current = false;
+  bool runtime = true, current = false, directoryExists = true;
   late Map<String, String> hashes = Map.of(Benro.compatibleHelperHashes);
   final calls = <String>[];
   UpgradeDevice()
@@ -27,7 +27,7 @@ class UpgradeDevice extends Benro {
     if (command.startsWith('sha256sum')) {
       return hashes.entries.map((e) => '${e.value}  $base/${e.key}').join('\n');
     }
-    return 'yes';
+    return directoryExists ? 'yes' : 'no';
   }
 
   @override
@@ -81,6 +81,15 @@ void main() {
       }
     },
   );
+  test('fresh card requires first setup, not repair', () async {
+    final d = UpgradeDevice()
+      ..runtime = false
+      ..directoryExists = false;
+    final result = await d.inspect();
+    expect(result['setup_required'], isTrue);
+    expect(result['setup_incomplete'], isFalse);
+    expect(d.calls, isEmpty);
+  });
   test('unusable runtime retains repair flow', () async {
     final d = UpgradeDevice()..runtime = false;
     expect((await d.inspect())['setup_incomplete'], isTrue);

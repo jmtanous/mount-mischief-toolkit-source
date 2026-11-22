@@ -634,6 +634,7 @@ class Benro {
         'operations': [],
         'controller_clients': count,
         'setup_incomplete': exists == 'yes',
+        'setup_required': exists != 'yes',
       };
     }
     return {

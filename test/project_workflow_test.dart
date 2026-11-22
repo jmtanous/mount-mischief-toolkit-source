@@ -36,6 +36,7 @@ class ManagedDevice extends Benro {
   bool installed = true;
   bool running = true;
   bool incomplete = false;
+  bool setupRequired = false;
   bool updateRequired = false;
   bool retained = false;
   bool failUninstall = false;
@@ -75,6 +76,7 @@ class ManagedDevice extends Benro {
     return {
       'controller_clients': running ? 1 : 0,
       'setup_incomplete': incomplete,
+      'setup_required': setupRequired,
       'setup_update_required': updateRequired,
       'operations': [],
       'projects': [
@@ -131,6 +133,7 @@ class ManagedDevice extends Benro {
     bool keepSettings = true,
   }) async {
     events.add('install:$reinstall:$keepSettings');
+    setupRequired = false;
     installed = true;
   }
 
@@ -870,6 +873,26 @@ void main() {
       );
     }
   }
+  testWidgets('Fresh card explains automatic setup and links to Catalog', (
+    tester,
+  ) async {
+    device.installed = false;
+    device.running = false;
+    device.setupRequired = true;
+    await open(tester, page: 'Device');
+    expect(find.text('Connected · setup needed'), findsOneWidget);
+    expect(find.text('Install Toolkit on this SD card'), findsOneWidget);
+    expect(find.text('Repair Toolkit setup'), findsNothing);
+    await tap(tester, 'Choose a project to install');
+    expect(find.text('Project catalog'), findsOneWidget);
+    expect(find.textContaining('Install sets up Toolkit'), findsOneWidget);
+    expect(events, isNot(contains('install:false:true')));
+    await tap(tester, 'Install');
+    await tester.pumpAndSettle();
+    expect(events, contains('install:false:true'));
+    expect(device.setupRequired, isFalse);
+  });
+
   testWidgets(
     'Old compatible tools keep Stop available and allow update after stopping',
     (tester) async {

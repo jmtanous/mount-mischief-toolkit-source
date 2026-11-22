@@ -192,6 +192,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
   int tab = 0, controllerCount = 0;
   bool busy = false, signedIn = false, inspected = false;
   bool setupIncomplete = false;
+  bool setupRequired = false;
   bool setupUpdateRequired = false;
   StartupProgress? startup;
   InstallationProgress? installation;
@@ -345,6 +346,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     device = null;
     inspected = false;
     setupIncomplete = false;
+    setupRequired = false;
     setupUpdateRequired = false;
     installed = [];
     operations = [];
@@ -475,6 +477,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     setState(() {
       inspected = false;
       setupIncomplete = false;
+      setupRequired = false;
       setupUpdateRequired = false;
       installed = [];
       operations = [];
@@ -618,6 +621,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
             .toList();
         controllerCount = state['controller_clients'] as int? ?? 0;
         setupIncomplete = state['setup_incomplete'] == true;
+        setupRequired = state['setup_required'] == true;
         setupUpdateRequired = state['setup_update_required'] == true;
         inspected = !setupIncomplete;
       });
@@ -1188,7 +1192,9 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
                   Expanded(
                     child: Text(
                       inspected
-                          ? 'Connected and ready'
+                          ? (setupRequired
+                                ? 'Connected · setup needed'
+                                : 'Connected and ready')
                           : setupIncomplete
                           ? 'Setup needs repair'
                           : 'Not connected',
@@ -1216,6 +1222,32 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
         ),
       ),
       const SizedBox(height: 12),
+      if (setupRequired)
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Install Toolkit on this SD card',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Toolkit is not installed on this card yet. Choose a project in Catalog and tap Install. MMT installs Toolkit first, then your project—there is no separate setup step.',
+                ),
+                const SizedBox(height: 12),
+                action(
+                  'Choose a project to install',
+                  () => setState(() => tab = 1),
+                  primary: true,
+                  icon: Icons.add,
+                ),
+              ],
+            ),
+          ),
+        ),
       if (!inspected && !setupIncomplete) ...[
         const Text(
           'Connect to Polaris',
@@ -1458,6 +1490,13 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
                       ? 'Verified offline package'
                       : 'Download before connecting to device Wi-Fi',
                 ),
+                if (setupRequired)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text(
+                      'Install sets up Toolkit on the SD card first, then installs this project. Keep MMT open until both finish.',
+                    ),
+                  ),
                 const SizedBox(height: 12),
                 Wrap(
                   children: [
@@ -1582,7 +1621,11 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
       if (!inspected)
         const Text('Pair and inspect a device to see its projects.'),
       if (inspected && installed.isEmpty)
-        const Text('No projects installed with MMT.'),
+        Text(
+          setupRequired
+              ? 'Toolkit is not installed on this SD card yet. Open Catalog and install a project to set up both.'
+              : 'No projects installed with MMT.',
+        ),
       for (final p in installed)
         Card(
           child: Padding(
