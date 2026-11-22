@@ -30,6 +30,16 @@ attended and have a recovery path.
 5. Install Pilot, then select Start and confirm the observing site.
 6. Wait for startup verification, then choose Open Pilot.
 
+The Pilot browser preserves its page when the phone rotates. Mount traffic stays
+on Polaris Wi-Fi; public map and site lookup requests use a validated internet
+connection, usually mobile data. Maps and name/weather lookups need internet.
+**LOCATE** requests the phone's Android location permission and a fresh fix (up to
+20 seconds), then uses Nominatim and Open-Meteo for the place name, elevation and
+pressure. Those services receive the coordinates. IP-based location fallback is
+disabled because it can identify the wrong observing site. If location or internet
+is unavailable, a message explains the problem; coordinates can still be entered
+manually. User-selected external links open in the phone's normal browser.
+
 “No internet” on Polaris Wi-Fi is normal. Android may switch to another network;
 check the association indicator if pairing fails. Wi-Fi wake requires the mount
 to be powered on. Keep MMT open during operations. An SSH timeout does not prove

@@ -988,17 +988,9 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     final paired = device;
     if (paired == null) throw StateError('Pair and inspect a device first.');
     await platform.invokeMethod<void>('bindWifi');
-    if (!await launchUrl(
-      Uri(scheme: 'http', host: paired.host, port: 8081),
-      // An external browser does not inherit MMT's Wi-Fi network binding.
-      mode: LaunchMode.inAppWebView,
-      webViewConfiguration: const WebViewConfiguration(
-        enableJavaScript: true,
-        enableDomStorage: true,
-      ),
-    )) {
-      throw StateError('Could not open Pilot');
-    }
+    await platform.invokeMethod<void>('openPilot', {
+      'url': Uri(scheme: 'http', host: paired.host, port: 8081).toString(),
+    });
   }
 
   Future<void> logs(InstalledProject p) async {

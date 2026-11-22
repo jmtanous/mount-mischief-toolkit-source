@@ -27,6 +27,15 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "org.mountmischief/toolkit")
             .setMethodCallHandler { call, result ->
                 when (call.method) {
+                    "openPilot" -> {
+                        val url = call.argument<String>("url")
+                        if (url == null || PilotActivity.originOf(url) == null)
+                            result.error("INVALID_URL", "Invalid Pilot address", null)
+                        else {
+                            startActivity(Intent(this, PilotActivity::class.java).putExtra("url", url))
+                            result.success(null)
+                        }
+                    }
                     "wifiStatus" -> result.success(wifiStatus.read())
                     "bluetoothScan" -> bluetoothWake.scan(result)
                     "bluetoothWake" -> bluetoothWake.wake(call.argument<String>("address"), result)

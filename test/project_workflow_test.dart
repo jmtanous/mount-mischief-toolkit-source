@@ -645,13 +645,15 @@ void main() {
   });
 
   testWidgets(
-    'Open Pilot uses Wi-Fi and in-app webview, returning keeps Stop available',
+    'Open Pilot uses Wi-Fi and native Pilot browser, returning keeps Stop available',
     (tester) async {
       await open(tester);
-      const launcher = MethodChannel('plugins.flutter.io/url_launcher');
+      const launcher = MethodChannel('org.mountmischief/toolkit');
       Map<dynamic, dynamic>? launched;
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(launcher, (call) async {
+            events.add('platform:${call.method}');
+            if (call.method != 'openPilot') return null;
             launched = call.arguments as Map;
             events.add('browser');
             for (final state in [
@@ -669,9 +671,6 @@ void main() {
       );
       await tap(tester, 'Open Pilot');
       expect(launched?['url'], 'http://192.168.0.1:8081');
-      expect(launched?['useWebView'], isTrue);
-      expect(launched?['enableJavaScript'], isTrue);
-      expect(launched?['enableDomStorage'], isTrue);
       expect(
         events.indexOf('platform:bindWifi'),
         lessThan(events.indexOf('browser')),

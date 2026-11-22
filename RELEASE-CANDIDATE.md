@@ -1,9 +1,15 @@
-# MMT 0.1.0-rc.1 (build 7) — local candidate
+# MMT 0.1.0-rc.1 (build 8) — local candidate
 
 This is a debug-signed test candidate, not a production release.
 The bundled Alpaca Pilot port remains 0.1.0-rc.1.
 
 ## Changes since build 2
+
+- A dedicated Pilot browser keeps the page/session through rotation, preserves
+  screen-awake and safe-area behavior, routes public map/lookups over validated
+  internet, and supplies phone location through Android permission handling.
+  Location requests time out/cancel cleanly; IP-based fallback is disabled.
+  Mount traffic remains bound to Wi-Fi. No mount runtime or firmware changes.
 
 - Pilot browser content now stays above Android navigation controls and clear of
   display cutouts and the keyboard. The Multi Point Alignment row was verified
@@ -24,6 +30,15 @@ The bundled Alpaca Pilot port remains 0.1.0-rc.1.
 - The approved clay icon and “It worked before I touched it.” motto remain.
 
 ## Validation
+
+Build 8: 16 Android tests and 28 Flutter project-workflow tests passed; Flutter
+analysis is clean. Debug APK installed preserving data. Live Pixel checks confirmed
+map rendering, a fresh native location fix, HTTP 200 and valid payloads from both
+Nominatim and Open-Meteo. Location-service testing was explicitly approved and did
+not update observing-site settings. Landscape retained the same document time
+origin and JavaScript marker; the original automatic rotation mode was restored.
+No remote Pilot restart, alignment action, movement, or firmware write was used.
+
 
 Build 7: all 11 Android tests passed, including browser viewport sizing across
 resume, navigation inset changes and keyboard visibility. Debug APK built and

@@ -12,7 +12,7 @@ class ToolkitApplication : Application(), Application.ActivityLifecycleCallbacks
     }
 
     private fun isPilotBrowser(activity: Activity) =
-        activity.javaClass.name == "io.flutter.plugins.urllauncher.WebViewActivity"
+        activity is PilotActivity || activity.javaClass.name == "io.flutter.plugins.urllauncher.WebViewActivity"
 
     override fun onActivityResumed(activity: Activity) {
         if (isPilotBrowser(activity)) ScreenAwake(activity).foreground = true
