@@ -31,3 +31,12 @@ Publish immutable package assets before enabling their catalog entries. The
 staged catalog-v2 is not ready to publish until the standalone runtime has a
 verified downloadable asset ID. v2.2.0 must not be listed before its dependency
 rebuild and acceptance tests pass. This document does not authorize publication.
+
+## Version ordering
+
+List releases for each project newest first in catalog-v2. MMT preserves this
+order in the version picker and initially selects the newest compatible release.
+An explicit user selection survives a catalog refresh while that release remains
+available. Project version strings can use different schemes; their text is not
+parsed to guess chronology. The recommended metadata flag does not override the
+newest-first display or the user's selection.

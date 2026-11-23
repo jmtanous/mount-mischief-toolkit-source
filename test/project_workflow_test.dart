@@ -16,11 +16,14 @@ import 'package:mount_mischief_toolkit/models.dart';
 
 class OfflineCatalog extends Catalog {
   final ProjectManifest project;
+  List<ProjectManifest>? versions;
   Object? packageFailure;
   Object? bootstrapFailure;
   OfflineCatalog(Directory cache, this.project) : super(cacheDirectory: cache);
   @override
-  Future<List<ProjectManifest>> cached() async => [project];
+  Future<List<ProjectManifest>> cached() async => versions ?? [project];
+  @override
+  Future<List<ProjectManifest>> refresh() => cached();
   @override
   Future<bool> available(ProjectManifest manifest) async => true;
   @override
@@ -920,6 +923,55 @@ void main() {
       );
     }
   }
+  testWidgets('Newest catalog release is first and selected despite older recommendation', (
+    tester,
+  ) async {
+    final latest = ProjectManifest({
+      ...project.json,
+      'version': '2.2.0-port.0.2.0-rc.1',
+      'sha256': 'a' * 64,
+      'recommended': false,
+    });
+    final older = ProjectManifest({...project.json, 'recommended': true});
+    catalog.versions = [latest, older];
+    device.installed = false;
+    device.running = false;
+    await open(tester, page: 'Catalog');
+    DropdownButton<String> picker() => tester.widget<DropdownButton<String>>(
+      find.byType(DropdownButton<String>),
+    );
+    expect(picker().items!.map((item) => item.value), [latest.hash, older.hash]);
+    expect(picker().value, latest.hash);
+    await tester.tap(find.byType(DropdownButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(older.version).last);
+    await tester.pumpAndSettle();
+    expect(picker().value, older.hash);
+    await tap(tester, 'Refresh catalog');
+    await tester.pumpAndSettle();
+    expect(picker().value, older.hash, reason: 'Refresh must preserve an explicit version choice');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Newest unsupported version stays visible but defaults to newest compatible', (
+    tester,
+  ) async {
+    final future = ProjectManifest({
+      ...project.json,
+      'version': 'future-release',
+      'sha256': 'f' * 64,
+      'min_mmt_build': 999,
+    }, allowUnsupported: true);
+    catalog.versions = [future, project];
+    await open(tester, page: 'Catalog');
+    final picker = tester.widget<DropdownButton<String>>(
+      find.byType(DropdownButton<String>),
+    );
+    expect(picker.items!.map((item) => item.value), [future.hash, project.hash]);
+    expect(picker.value, project.hash);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Fresh card explains automatic setup and links to Catalog', (
     tester,
   ) async {

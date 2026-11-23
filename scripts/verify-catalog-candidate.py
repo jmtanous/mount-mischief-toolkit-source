@@ -18,7 +18,8 @@ catalog = json.loads(a.catalog.read_text())
 assert catalog['schema'] == 2 and len(catalog['projects']) == 2
 runtime = json.loads((root/'assets/toolkit-runtime.json').read_text())
 assert all(catalog['runtime'][k] == v for k,v in runtime.items())
-beta, release = catalog['projects']
+release, beta = catalog['projects']
+assert release['version'] == '2.2.0-port.0.2.0-rc.1', 'Catalog must list newest release first'
 assert beta['id'] == release['id'] == 'alpaca-pilot'
 assert beta['sha256'] == '30d34031d479505ce3f05a9cdabc6264f231ed7a2aec029edb0fff11c4467f1d'
 assert beta['recommended'] and not release['recommended']

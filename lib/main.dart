@@ -1230,10 +1230,13 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     ],
   );
   final Map<String, String> selectedVersions = {};
+  // Catalog publishers list each project's releases newest first. Version names
+  // are project-defined; preserve that order rather than guessing their syntax.
+  // Keep an explicit choice across refreshes, otherwise select the newest usable release.
   Iterable<ProjectManifest> get selectedProjects => projects.map((p) => p.id).toSet().map((id) {
     final versions = projects.where((p) => p.id == id).toList();
     return versions.firstWhere((p) => p.hash == selectedVersions[id],
-      orElse: () => versions.firstWhere((p) => p.json['recommended'] == true, orElse: () => versions.first));
+      orElse: () => versions.firstWhere((p) => p.supported, orElse: () => versions.first));
   });
 
   Widget catalogPage() => Column(
