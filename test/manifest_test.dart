@@ -51,6 +51,23 @@ void main() {
       );
     }
   });
+  test('New projects and incompatible revisions are visible but cannot install', () {
+    for (final change in [
+      {'id': 'new-project', 'adapter': 'new-project-v1'},
+      {'min_integration_revision': 2},
+      {'min_mmt_build': 999},
+      {'min_manager_schema': 2},
+    ]) {
+      final value = {...seed, ...change};
+      expect(ProjectManifest(value, allowUnsupported: true).supported, isFalse);
+      expect(() => ProjectManifest(value), throwsFormatException);
+    }
+  });
+  test('Compatible project releases do not require an app update', () {
+    for (final version in ['2.2-beta8-port.0.1.0-rc.2', '2.2.0-port.0.2.0']) {
+      expect(ProjectManifest({...seed, 'version': version, 'min_integration_revision': 1}).supported, isTrue);
+    }
+  });
   test(
     'Validated manifest cannot be changed through the source map or lists',
     () {

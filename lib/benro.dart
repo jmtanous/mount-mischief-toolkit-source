@@ -1,5 +1,6 @@
 import 'installation_progress.dart';
 
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -14,9 +15,11 @@ import 'startup_progress.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/services.dart';
 
+part 'integrations/pilot_lifecycle.dart';
+
 const deviceHost = '192.168.0.1';
 const bundleHash =
-    '30d34031d479505ce3f05a9cdabc6264f231ed7a2aec029edb0fff11c4467f1d';
+    '131b8458fe77d604c929bc2059cb737263096e42b63b7d12a6dcd5284cfc2b0c';
 const toolkitBase = '/app/sd/mount-mischief-toolkit';
 String quote(String s) => "'${s.replaceAll("'", "'\\''")}'";
 
@@ -444,7 +447,7 @@ class Benro {
     return true;
   }
 
-  // The rc.1 helper set uses the same list/stop protocol. Only this exact,
+  // Previously shipped helper sets use the same list/stop protocol. Only exact,
   // previously shipped set is allowed to manage projects before an update.
   static const compatibleHelperHashes = {
     'manager.py':
@@ -454,6 +457,15 @@ class Benro {
     'pilot_native.py':
         'fab5e63f3b05176938f2f4f9e18ef2b8c80f89927c16b979cc6cc8800b79e9a1',
   };
+
+  static const compatibleHelperSets = [
+    compatibleHelperHashes,
+    {
+      'pilot_adapter.py': 'a94d3da83619597026c58af4376c204429e7f0fdec1c31722eef16b2311450b1',
+      'pilot_native.py': 'fab5e63f3b05176938f2f4f9e18ef2b8c80f89927c16b979cc6cc8800b79e9a1',
+      'manager.py': 'fd458143929e47af7194fea8ad39dc1a0f4599581141388a7a0317f6d5d0b6a8',
+    },
+  ];
 
   Future<bool> hasCompatibleHelpers() async {
     final output = await shell(
@@ -465,9 +477,9 @@ class Benro {
       final parts = line.trim().split(RegExp(r'\s+'));
       if (parts.length == 2) actual[parts[1]] = parts[0];
     }
-    return compatibleHelperHashes.entries.every(
+    return compatibleHelperSets.any((expected) => expected.entries.every(
       (entry) => actual['$base/${entry.key}'] == entry.value,
-    );
+    ));
   }
 
   Future<int> controllers() async => int.parse(
@@ -669,6 +681,7 @@ class Benro {
     bool reinstall = false,
     bool keepSettings = true,
   }) async {
+    if (!manifest.supported) throw StateError('Update MMT required');
     if (await otherControllers() != 0) {
       throw StateError(
         'Another controller is connected. Disconnect it before installation.',
@@ -731,127 +744,9 @@ class Benro {
     String project,
     Site site, {
     void Function(StartupEvent)? onProgress,
-  }) async {
-    var stage = StartupStage.checking;
-    void report(
-      StartupStage value, {
-      bool response = false,
-      bool existing = false,
-      StartupCleanup? cleanup,
-    }) {
-      stage = value;
-      onProgress?.call(
-        StartupEvent(
-          value,
-          responseReceived: response,
-          alreadyRunning: existing,
-          cleanup: cleanup,
-        ),
-      );
-    }
-
-    report(stage);
-    site.validate();
-    final current = await call('inspect', project: project);
-    report(stage, response: true);
-    if (current['running'] == true) {
-      report(StartupStage.verifying, existing: true);
-      return current;
-    }
-    if (current['external_pilot'] != null || await otherControllers() != 0) {
-      throw StateError('Another controller or unmanaged Pilot is running');
-    }
-    final borrowed = _sessionHeartbeat != null;
-    final heartbeat = _sessionHeartbeat ?? createKeepalive();
-    var started = false;
-    try {
-      if (!borrowed) await heartbeat.start();
-      report(StartupStage.launching);
-      progress('Starting Pilot with the confirmed time and location…');
-      await call(
-        'start',
-        project: project,
-        fields: {
-          'operation': operationId(),
-          'site': site.toJson(),
-          'epoch': DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000,
-        },
-      );
-      started = true;
-      report(StartupStage.waiting);
-      final deadline = DateTime.now().add(const Duration(minutes: 3));
-      while (true) {
-        heartbeat.check();
-        final status = await call(
-          'inspect',
-          project: project,
-          timeout: const Duration(seconds: 25),
-        );
-        report(stage, response: true);
-        if (status['pilot'] != null) break;
-        if (status['running'] != true) {
-          throw StateError('Pilot exited. Read diagnostics before retrying.');
-        }
-        if (DateTime.now().isAfter(deadline)) {
-          throw TimeoutException('Pilot startup timed out');
-        }
-        await Future<void>.delayed(const Duration(seconds: 2));
-      }
-      report(StartupStage.handover);
-      progress('Handing the controller connection to Pilot…');
-      if (borrowed) _sessionHeartbeat = null;
-      await heartbeat.close();
-      for (var i = 0; i < 10 && await controllers() != 0; i++) {
-        await Future<void>.delayed(const Duration(milliseconds: 300));
-      }
-      await call(
-        'connect',
-        project: project,
-        fields: {'operation': operationId()},
-      );
-      report(StartupStage.verifying);
-      final connectedDeadline = DateTime.now().add(const Duration(seconds: 60));
-      while (DateTime.now().isBefore(connectedDeadline)) {
-        final state = await call(
-          'inspect',
-          project: project,
-          timeout: const Duration(seconds: 25),
-        );
-        report(stage, response: true);
-        final pilot = state['pilot'] as Map?;
-        if (pilot?['connected'] == true &&
-            (pilot?['age517'] as num? ?? 999) < 5) {
-          progress(
-            'Pilot connected. It will keep running when you close Toolkit.',
-          );
-          return state;
-        }
-        await Future<void>.delayed(const Duration(seconds: 1));
-      }
-      throw TimeoutException('Pilot connection did not become ready');
-    } catch (_) {
-      if (started) {
-        report(stage, cleanup: StartupCleanup.stopping);
-        try {
-          // Failure cleanup must not acquire a replacement heartbeat.
-          await call(
-            'stop',
-            project: project,
-            fields: {'operation': operationId()},
-          );
-          report(stage, cleanup: StartupCleanup.confirmed);
-        } catch (_) {
-          report(stage, cleanup: StartupCleanup.uncertain);
-          progress(
-            'Cleanup could not be confirmed. Reconnect and inspect the device.',
-          );
-        }
-      }
-      rethrow;
-    } finally {
-      if (identical(_sessionHeartbeat, heartbeat)) _sessionHeartbeat = null;
-      await heartbeat.close();
-    }
+  }) {
+    if (project != 'alpaca-pilot') throw StateError('Update MMT required');
+    return startPilot(this, project, site, onProgress: onProgress);
   }
 
   void close() {

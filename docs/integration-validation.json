@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-23",
+  "flutter_tests_passed": 118,
+  "analysis": "no issues",
+  "runtime_imports_in_captured_userspace": [
+    "hashlib",
+    "json",
+    "tarfile",
+    "fcntl"
+  ],
+  "runtime_sha256": "131b8458fe77d604c929bc2059cb737263096e42b63b7d12a6dcd5284cfc2b0c",
+  "physical_acceptance": true,
+  "published": false,
+  "python_helper_tests_passed": 41,
+  "python_helper_arm_tests_passed": 41,
+  "settings_rollback": "per-archive snapshots; upgrade, downgrade, failed activation and delete-settings tests passed",
+  "pilot_ui_extracted": true,
+  "combined_download_progress": true,
+  "standalone_setup_recovery_arm": "passed: lost activation reply, missing helper, corrupt interpreter, settings retained",
+  "release_apk": "build 12 production-signed; docs/build12-release-validation.json",
+  "full_archive_arm_version_switch": "passed: Beta 8 install, 2.2.0 upgrade, Beta 8 rollback; separate settings snapshots; runtime uploaded once",
+  "isolated_public_source_build": "debug APK built with no runtime/project archive",
+  "task_vm_state": "shut down cleanly after local tests",
+  "existing_sd_acceptance": {
+    "result": "passed core checks after connection recovery",
+    "receipt": "docs/existing-sd-build12-acceptance.json",
+    "fresh_sd": false,
+    "post_stop_network_repeat": "passed for 134 seconds; earlier incident cause unresolved"
+  },
+  "physical_acceptance_scope": {
+    "scope": "stationary existing-SD upgrade/rollback and clean Toolkit directory on existing filesystem",
+    "result": "passed; one recovered network incident did not recur in monitored repeat",
+    "receipt": "docs/ATTENDED-ACCEPTANCE.md",
+    "freshly_formatted_card": false,
+    "public_downloads": false,
+    "post_stop_keepalive_seconds": 134.379,
+    "motor_or_observing_accuracy": false
+  }
+}

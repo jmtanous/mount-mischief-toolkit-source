@@ -16,6 +16,8 @@ import 'models.dart';
 import 'startup_progress.dart';
 import 'installation_progress.dart';
 
+part 'integrations/pilot_ui.dart';
+
 const independence = communityNotice;
 const platform = MethodChannel('org.mountmischief/toolkit');
 typedef DeviceFactory = Benro Function(
@@ -38,8 +40,8 @@ void main() {
       ], await rootBundle.loadString(entry.value));
     }
     for (final registry in {
-      'Alpaca Pilot runtime': 'assets/legal/runtime-licenses.json',
       'Android and Flutter': 'assets/legal/platform-licenses.json',
+      'Toolkit runtime': 'assets/legal/runtime-licenses.json',
     }.entries) {
       final notices = jsonDecode(
         await rootBundle.loadString(registry.value),
@@ -277,6 +279,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
   String message = 'Download a project, then connect to your device Wi-Fi.';
   String? error;
   String? catalogNotice;
+  Map<String, int> downloadSizes = {};
   @override
   void initState() {
     super.initState();
@@ -357,6 +360,10 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     message = 'Device session ended. Join its Wi-Fi and use Pair and inspect to reconnect.';
   }
 
+  void updateUi(VoidCallback callback) {
+    if (mounted) setState(callback);
+  }
+
   void progress(String value) {
     if (mounted) setState(() => message = value);
   }
@@ -364,15 +371,29 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
   Future<void> load() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final list = await catalog.cached();
+      var list = await catalog.cached();
+      if (list.isEmpty && widget.catalog == null) {
+        try {
+          list = await catalog.refresh();
+        } catch (_) {
+          catalog.cacheNotice = 'Catalog could not be loaded. Connect to the internet and tap Refresh catalog.';
+        }
+      }
       final ready = <String>{};
-      for (final p in list) {
-        if (await catalog.available(p)) ready.add(p.hash);
+      final sizes = <String, int>{};
+      for (final p in list.where((p) => p.supported)) {
+        if (await catalog.ready(p)) {
+          ready.add(p.hash);
+          sizes[p.hash] = 0;
+        } else {
+          sizes[p.hash] = await catalog.requiredDownloadBytes(p);
+        }
       }
       if (mounted) {
         setState(() {
           projects = list;
           cached = ready;
+          downloadSizes = sizes;
           catalogNotice = catalog.cacheNotice;
           host.text = prefs.getString('device_host') ?? deviceHost;
         });
@@ -678,12 +699,17 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
 
   Future<void> download(ProjectManifest p) async {
     await platform.invokeMethod<void>('releaseNetwork');
-    await catalog.download(
+    await catalog.prepare(
       p,
       (count, total) =>
           progress('Downloading ${p.name}: ${(count * 100 / total).floor()}%'),
     );
-    if (mounted) setState(() => cached.add(p.hash));
+    if (mounted) {
+      setState(() {
+        cached.add(p.hash);
+        downloadSizes[p.hash] = 0;
+      });
+    }
     progress('${p.name} is ready for offline installation.');
   }
 
@@ -715,6 +741,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     ),
   );
   Future<void> install(ProjectManifest p, {InstalledProject? current}) async {
+    if (!p.supported) throw StateError('Update MMT required');
     if (device == null || !inspected) {
       throw StateError('Pair and inspect the device first');
     }
@@ -730,11 +757,23 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
       if (choice == null) return;
       keep = choice;
     }
-    final archive = await catalog.bundled(
-      p,
-    ); // Uses verified cached downloads when present.
-    // Bootstrap is always the application-bundled pinned runtime, independent of catalog updates.
-    final bootstrap = await catalog.bootstrap();
+    final File archive;
+    final File bootstrap;
+    try {
+      archive = await catalog.bundled(p);
+      // Bootstrap stays pinned to the app, independent of catalog updates.
+      bootstrap = await catalog.bootstrap();
+    } catch (e) {
+      // Local preparation has not touched the device. Keep its session and
+      // running project available so the user can recover or choose a version.
+      if (mounted) {
+        setState(() {
+          error = 'Installation package is not ready.\n${e is StateError ? e.message : e}';
+          message = 'Installation not started. Device remains paired.';
+        });
+      }
+      return;
+    }
     await platform.invokeMethod<void>('bindWifi');
     if (current == null && await device!.hasToolchain()) {
       final state = await device!.call('inspect', project: p.id);
@@ -773,189 +812,6 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     await device!.uninstall(p.id, keep);
     await refreshDevice();
     progress('Project uninstalled.');
-  }
-
-  Future<Site?> siteDialog(InstalledProject project) async {
-    final saved = project.json['settings'] as Map? ?? {};
-    final name = TextEditingController(
-      text: saved['location']?.toString() ?? '',
-    );
-    final lat = TextEditingController(
-      text: saved['site_latitude']?.toString() ?? '',
-    );
-    final lon = TextEditingController(
-      text: saved['site_longitude']?.toString() ?? '',
-    );
-    final elevation = TextEditingController(
-      text: saved['site_elevation']?.toString() ?? '',
-    );
-    String? validation;
-    bool locating = false;
-    final result = await showDialog<Site>(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, update) => AlertDialog(
-          title: const Text('Confirm observing site'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Starting synchronizes device time with this phone and applies this location. Alignment remains in Pilot.',
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: name,
-                  decoration: const InputDecoration(labelText: 'Site name'),
-                ),
-                for (final item in [
-                  (lat, 'Latitude (degrees)'),
-                  (lon, 'Longitude (degrees)'),
-                  (elevation, 'Elevation (metres)'),
-                ])
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: TextField(
-                      controller: item.$1,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                        signed: true,
-                      ),
-                      decoration: InputDecoration(labelText: item.$2),
-                    ),
-                  ),
-                const SizedBox(height: 8),
-                TextButton.icon(
-                  onPressed: locating
-                      ? null
-                      : () async {
-                          update(() => locating = true);
-                          try {
-                            var permission = await Geolocator.checkPermission();
-                            if (permission == LocationPermission.denied) {
-                              permission = await Geolocator.requestPermission();
-                            }
-                            if (permission == LocationPermission.denied ||
-                                permission ==
-                                    LocationPermission.deniedForever) {
-                              throw StateError(
-                                'Location permission denied. Enter coordinates manually.',
-                              );
-                            }
-                            final position =
-                                await Geolocator.getCurrentPosition(
-                                  locationSettings: const LocationSettings(
-                                    accuracy: LocationAccuracy.high,
-                                    timeLimit: Duration(seconds: 30),
-                                  ),
-                                );
-                            if (!context.mounted) return;
-                            lat.text = position.latitude.toStringAsFixed(6);
-                            lon.text = position.longitude.toStringAsFixed(6);
-                            elevation.text = position.altitude.toStringAsFixed(
-                              0,
-                            );
-                            update(
-                              () => validation =
-                                  'GPS accuracy: ${position.accuracy.round()} m. Review all values before starting.',
-                            );
-                          } catch (e) {
-                            if (context.mounted) {
-                              update(() => validation = e.toString());
-                            }
-                          } finally {
-                            if (context.mounted) update(() => locating = false);
-                          }
-                        },
-                  icon: const Icon(Icons.my_location),
-                  label: Text(locating ? 'Locating…' : 'Use phone location'),
-                ),
-                if (validation != null) Text(validation!),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: locating
-                  ? null
-                  : () {
-                      try {
-                        final site = Site(
-                          name.text.trim(),
-                          double.parse(lat.text),
-                          double.parse(lon.text),
-                          double.parse(elevation.text),
-                        );
-                        site.validate();
-                        Navigator.pop(context, site);
-                      } catch (_) {
-                        update(
-                          () => validation = 'Enter a site name and valid numeric coordinates.',
-                        );
-                      }
-                    },
-              child: const Text('Confirm and start'),
-            ),
-          ],
-        ),
-      ),
-    );
-    // Dialog animations may still reference controllers; dispose after route transition.
-    Future<void>.delayed(const Duration(seconds: 1), () {
-      name.dispose();
-      lat.dispose();
-      lon.dispose();
-      elevation.dispose();
-    });
-    return result;
-  }
-
-  Future<void> start(InstalledProject p) async {
-    final site = await siteDialog(p);
-    if (site == null) return;
-    startup?.dispose();
-    final attempt = StartupProgress();
-    setState(() => startup = attempt);
-    try {
-      await platform.invokeMethod<void>('bindWifi');
-      await device!.start(
-        p.id,
-        site,
-        onProgress: (event) {
-          if (mounted && identical(startup, attempt)) attempt.update(event);
-        },
-      );
-      await refreshDevice();
-      if (mounted && identical(startup, attempt)) {
-        if (!installed.any(
-          (item) => item.manifest.id == p.manifest.id && item.running,
-        )) {
-          throw StateError(
-            'Pilot is not running after the status refresh. Reconnect and inspect before retrying.',
-          );
-        }
-        attempt.update(
-          StartupEvent(StartupStage.verifying, responseReceived: true),
-        );
-        attempt.finish();
-      }
-    } catch (e) {
-      if (mounted && identical(startup, attempt)) attempt.finish(error: e);
-      rethrow;
-    }
-  }
-
-  Future<void> openPilot() async {
-    final paired = device;
-    if (paired == null) throw StateError('Pair and inspect a device first.');
-    await platform.invokeMethod<void>('bindWifi');
-    await platform.invokeMethod<void>('openPilot', {
-      'url': Uri(scheme: 'http', host: paired.host, port: 8081).toString(),
-    });
   }
 
   Future<void> logs(InstalledProject p) async {
@@ -1373,6 +1229,13 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
       ),
     ],
   );
+  final Map<String, String> selectedVersions = {};
+  Iterable<ProjectManifest> get selectedProjects => projects.map((p) => p.id).toSet().map((id) {
+    final versions = projects.where((p) => p.id == id).toList();
+    return versions.firstWhere((p) => p.hash == selectedVersions[id],
+      orElse: () => versions.firstWhere((p) => p.json['recommended'] == true, orElse: () => versions.first));
+  });
+
   Widget catalogPage() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -1381,6 +1244,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
         style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
       ),
       const Text('Download with internet. Connect to Polaris to install.'),
+      if (projects.isEmpty) const Text('No projects downloaded. Refresh the catalog with internet access.'),
       if (catalogNotice != null) ...[
         const SizedBox(height: 12),
         Text(catalogNotice!),
@@ -1398,7 +1262,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
         }),
         icon: Icons.refresh,
       ),
-      for (final p in projects)
+      for (final p in selectedProjects)
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -1406,6 +1270,15 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(p.name, style: Theme.of(context).textTheme.titleLarge),
+                if (!p.supported) const Text('Update MMT required'),
+                DropdownButton<String>(
+                  value: p.hash,
+                  isExpanded: true,
+                  items: projects.where((v) => v.id == p.id).map((v) => DropdownMenuItem(
+                    value: v.hash, child: Text(v.version),
+                  )).toList(),
+                  onChanged: busy ? null : (value) => setState(() => selectedVersions[p.id] = value!),
+                ),
                 const SizedBox(height: 8),
                 if (p.id == 'alpaca-pilot')
                   const Text(
@@ -1418,13 +1291,15 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
                   style: TextStyle(fontSize: 12, color: Color(0xff85daca)),
                 ),
                 Text(
-                  '${p.version} · ${(p.bytes / 1048576).toStringAsFixed(1)} MiB',
+                  '${p.version} · ${(p.bytes / 1048576).toStringAsFixed(1)} MiB project',
                 ),
                 Text(
                   cached.contains(p.hash)
                       ? 'Verified offline package'
                       : 'Download before connecting to device Wi-Fi',
                 ),
+                if (downloadSizes[p.hash] != null && downloadSizes[p.hash]! > 0)
+                  Text('${(downloadSizes[p.hash]! / 1048576).toStringAsFixed(1)} MiB remaining, including required Toolkit setup'),
                 if (setupRequired)
                   const Padding(
                     padding: EdgeInsets.only(top: 8),
@@ -1438,12 +1313,14 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
                     action(
                       'Download',
                       () => run(() => download(p)),
+                      enabled: p.supported,
                       icon: Icons.download,
                     ),
                     if (!installed.any((x) => x.id == p.id))
                       action(
                         'Install',
                         () => run(() => install(p)),
+                        enabled: p.supported,
                         icon: Icons.add,
                       ),
                     if (installed.any(
@@ -1457,6 +1334,7 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
                             current: installed.firstWhere((x) => x.id == p.id),
                           ),
                         ),
+                        enabled: p.supported,
                         icon: Icons.swap_horiz,
                       ),
                   ],
@@ -1467,53 +1345,6 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
         ),
     ],
   );
-  Widget projectStatus(
-    String label,
-    String value,
-    IconData icon,
-    bool positive,
-  ) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Wrap(
-      alignment: WrapAlignment.spaceBetween,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 12,
-      runSpacing: 6,
-      children: [
-        Text(label, style: const TextStyle(color: Color(0xffc9c4d8))),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-          decoration: BoxDecoration(
-            color: positive ? const Color(0xff005047) : const Color(0xff2b2933),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 15,
-                color: positive
-                    ? const Color(0xff44e2cd)
-                    : const Color(0xffc9c4d8),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: positive
-                      ? const Color(0xff44e2cd)
-                      : const Color(0xffc9c4d8),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-
   Widget toolkitUpdateNotice() => Card(
     child: Padding(
       padding: const EdgeInsets.all(16),
@@ -1543,162 +1374,6 @@ class _ToolkitHomeState extends State<ToolkitHome> with WidgetsBindingObserver {
     ),
   );
 
-  Widget installedPage() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Text(
-        'Installed projects',
-        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-      ),
-      if (device != null)
-        action('Refresh device', () => run(refreshDevice), icon: Icons.refresh),
-      if (setupUpdateRequired) toolkitUpdateNotice(),
-      if (!inspected)
-        const Text('Pair and inspect a device to see its projects.'),
-      if (inspected && installed.isEmpty)
-        Text(
-          setupRequired
-              ? 'Toolkit is not installed on this SD card yet. Open Catalog and install a project to set up both.'
-              : 'No projects installed with MMT.',
-        ),
-      for (final p in installed)
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  p.manifest.name,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                Text(p.manifest.version),
-                const SizedBox(height: 16),
-                projectStatus(
-                  'Service',
-                  p.running ? 'Running' : 'Stopped',
-                  p.running
-                      ? Icons.play_circle_outline
-                      : Icons.stop_circle_outlined,
-                  p.running,
-                ),
-                projectStatus(
-                  'Controller',
-                  p.pilot?['connected'] == true ? 'Connected' : 'Disconnected',
-                  Icons.link,
-                  p.pilot?['connected'] == true,
-                ),
-                projectStatus(
-                  'Alignment',
-                  p.pilot?['aligned'] == true ? 'Aligned' : 'Not confirmed',
-                  Icons.explore_outlined,
-                  p.pilot?['aligned'] == true,
-                ),
-                if (p.json['external_pilot'] != null)
-                  const Text('An unmanaged Pilot service is present.'),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: action(
-                    'Open Pilot',
-                    () => run(openPilot),
-                    enabled: p.running,
-                    icon: Icons.open_in_browser,
-                  ),
-                ),
-                Wrap(
-                  children: [
-                    if (!p.running)
-                      action(
-                        'Start',
-                        () => run(() => start(p)),
-                        icon: Icons.play_arrow,
-                      ),
-                    if (p.running)
-                      action(
-                        'Stop',
-                        () => run(() async {
-                          final ok = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text('Stop ${p.manifest.name}?'),
-                              content: const Text(
-                                'This disconnects and stops the managed Pilot process.',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, false),
-                                  child: const Text('Cancel'),
-                                ),
-                                FilledButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Stop'),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (ok == true) {
-                            await platform.invokeMethod<void>('bindWifi');
-                            await device!.stop(p.id);
-                            await refreshDevice();
-                          }
-                        }),
-                        icon: Icons.stop,
-                      ),
-                    const SizedBox(
-                      width: double.infinity,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Divider(),
-                            Text(
-                              'Maintenance',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xffb9b4c9),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    action(
-                      'Reinstall',
-                      () => run(() => install(p.manifest, current: p)),
-                    ),
-                    action(
-                      'Uninstall',
-                      () => run(() => remove(p)),
-                      icon: Icons.delete_outline,
-                    ),
-                    action(
-                      'Diagnostics',
-                      () => run(() => logs(p)),
-                      icon: Icons.receipt_long,
-                    ),
-                  ],
-                ),
-                if (!p.running)
-                  const Text('Start Pilot before opening its interface.'),
-              ],
-            ),
-          ),
-        ),
-      for (final op in operations.where((o) => o.phase != 'complete'))
-        ListTile(
-          leading: const Icon(Icons.info_outline),
-          title: Text('${op.project}: ${op.action} — ${op.phase}'),
-          subtitle: Text(
-            op.json['error']?.toString() ??
-                op.json['detail']?.toString() ??
-                'Inspect project state before retrying.',
-          ),
-        ),
-    ],
-  );
   Widget errorNotice() {
     final lines = error!.split('\n');
     return Card(

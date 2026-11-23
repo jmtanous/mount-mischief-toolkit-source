@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-23",
+  "updated_utc": "2026-11-23T19:47:32.305390+00:00",
+  "scope": "Clean active Toolkit directory on existing SD, prepared reversibly after owner authorized use/formatting of current card",
+  "filesystem_formatted": false,
+  "old_installation_preserved_in_backup": true,
+  "active_toolkit_absent_before_install": true,
+  "mmt_initial_state": "Connected, setup needed, zero managed projects",
+  "mmt_build": 12,
+  "apk_sha256": "6ac9b5aeb5f4581c805e7a237594f5a2d0f3a5a7b1c993613fd7f59d7a4194de",
+  "runtime": {
+    "sha256": "131b8458fe77d604c929bc2059cb737263096e42b63b7d12a6dcd5284cfc2b0c",
+    "verified_files": 915,
+    "all_installed_files_match_archive": true,
+    "project_in_runtime": false,
+    "site_packages_empty": true
+  },
+  "pilot": {
+    "version": "2.2.0-port.0.2.0-rc.1",
+    "sha256": "1e4fe3b33c0eeacafa85e9f4ae9e2558457e3bf38f22efee30529d4086a69520",
+    "verified_files": 4605,
+    "fresh_settings_empty": true,
+    "retained_settings": false
+  },
+  "disconnect_repair": "passed: connected and ready, one managed project, no setup/repair request",
+  "startup_stop_repeat": {
+    "startup": "ready and connected",
+    "age517_seconds": 0.49742533300013747,
+    "dashboard": "rendered on phone",
+    "tracking": false,
+    "aligned": false,
+    "slewing": false,
+    "gotoing": false,
+    "stop": "clean shutdown; stopped/disconnected; stopped banner",
+    "connection_observation": {
+      "samples": 100,
+      "interval_seconds": 2,
+      "post_stop_samples": 68,
+      "post_stop_seconds": 134.379,
+      "post_stop_controller_counts": [
+        1
+      ],
+      "delayed_mmt_refresh_succeeded": true,
+      "previous_drop_reproduced": false,
+      "previous_drop_root_cause": "unresolved; retain as observed recovered incident"
+    }
+  },
+  "delivery": "privately staged verified cache; no public-download claim",
+  "physical_motion_requested": false,
+  "published": false,
+  "limitations": [
+    "Existing filesystem, not a newly formatted or replacement card",
+    "Privately staged cache; public catalog/asset downloads remain untested",
+    "Earlier recovered connection drop did not recur; its root cause remains undetermined",
+    "No alignment, tracking, movement or observing-accuracy acceptance"
+  ],
+  "result": "passed within stationary clean-directory scope",
+  "final_state": {
+    "version": "2.2.0-port.0.2.0-rc.1",
+    "running": false,
+    "managed_process": false,
+    "controller_clients": 0,
+    "mmt_disconnected": true,
+    "owner_confirmed_site_matches_original": true,
+    "previous_installation_preserved_in_backup": true
+  }
+}

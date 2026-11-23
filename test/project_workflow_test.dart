@@ -16,16 +16,25 @@ import 'package:mount_mischief_toolkit/models.dart';
 
 class OfflineCatalog extends Catalog {
   final ProjectManifest project;
+  Object? packageFailure;
+  Object? bootstrapFailure;
   OfflineCatalog(Directory cache, this.project) : super(cacheDirectory: cache);
   @override
   Future<List<ProjectManifest>> cached() async => [project];
   @override
   Future<bool> available(ProjectManifest manifest) async => true;
   @override
-  Future<File> bundled(ProjectManifest manifest) async =>
-      File('${cacheDirectory!.path}/fixture.tar.gz');
+  Future<bool> ready(ProjectManifest manifest) async => true;
   @override
-  Future<File> bootstrap() => bundled(project);
+  Future<File> bundled(ProjectManifest manifest) async {
+    if (packageFailure != null) throw packageFailure!;
+    return File('${cacheDirectory!.path}/fixture.tar.gz');
+  }
+  @override
+  Future<File> bootstrap() async {
+    if (bootstrapFailure != null) throw bootstrapFailure!;
+    return bundled(project);
+  }
 }
 
 class ManagedDevice extends Benro {
@@ -39,6 +48,7 @@ class ManagedDevice extends Benro {
   bool retained = false;
   bool failUninstall = false;
   bool failStart = false;
+  bool failStop = false;
   bool failInspect = false;
   bool failRepair = false;
   bool closed = false;
@@ -112,6 +122,7 @@ class ManagedDevice extends Benro {
   @override
   Future<void> stop(String project) async {
     events.add('stop');
+    if (failStop) throw const SocketException('connection lost during stop');
     running = false;
   }
 
@@ -153,6 +164,8 @@ void main() {
   late ProjectManifest project;
   late List<String> events;
   late ManagedDevice device;
+  late OfflineCatalog catalog;
+  late void Function(String) deviceProgress;
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
@@ -171,6 +184,7 @@ void main() {
     );
     events = [];
     device = ManagedDevice(project, events);
+    catalog = OfflineCatalog(temp, project);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(platform, (call) async {
           events.add('platform:${call.method}');
@@ -194,8 +208,11 @@ void main() {
     await tester.pumpWidget(
       RepaintBoundary(
         child: ToolkitApp(
-          catalog: OfflineCatalog(temp, project),
-          deviceFactory: (_, _, _) => device,
+          catalog: catalog,
+          deviceFactory: (_, progress, _) {
+            deviceProgress = progress;
+            return device;
+          },
         ),
       ),
     );
@@ -833,6 +850,39 @@ void main() {
     },
   );
 
+  for (final bootstrapFails in [false, true]) {
+    testWidgets(
+      'Local ${bootstrapFails ? 'bootstrap' : 'package'} failure preserves pairing and running project',
+      (tester) async {
+        if (bootstrapFails) {
+          catalog.bootstrapFailure = const FileSystemException(
+            'cache unavailable',
+          );
+        } else {
+          catalog.packageFailure = StateError('Version is not available offline');
+        }
+        await open(tester);
+        await tap(tester, 'Reinstall');
+        await tap(tester, 'Keep settings');
+        expect(find.text('Installation package is not ready.'), findsOneWidget);
+        expect(
+          find.text('Installation not started. Device remains paired.'),
+          findsOneWidget,
+        );
+        expect(device.closed, isFalse);
+        expect(device.running, isTrue);
+        expect(device.installed, isTrue);
+        expect(events.where((e) => !e.startsWith('platform:')), isEmpty);
+        expect(events, isNot(contains('platform:bindWifi')));
+        expect(find.text('Stop'), findsOneWidget);
+        // A local error must not prevent a subsequent successful operation.
+        await tap(tester, 'Refresh device');
+        expect(find.text('Installation package is not ready.'), findsNothing);
+        expect(device.closed, isFalse);
+      },
+    );
+  }
+
   for (final operation in ['Reinstall', 'Uninstall']) {
     testWidgets('$operation cancel preserves running project', (tester) async {
       await open(tester);
@@ -925,9 +975,14 @@ void main() {
     'Stop requires confirmation and cancellation leaves project running',
     (tester) async {
       await open(tester);
+      deviceProgress(
+        'Pilot connected. It will keep running when you close Toolkit.',
+      );
+      await tester.pump();
       await tap(tester, 'Stop');
       await tap(tester, 'Cancel');
       expect(device.running, isTrue);
+      expect(find.textContaining('Pilot connected.'), findsOneWidget);
       await tap(tester, 'Stop');
       await tester.tap(
         find.descendant(
@@ -939,6 +994,28 @@ void main() {
       await tester.pumpAndSettle();
       expect(device.running, isFalse);
       expect(events.where((e) => e == 'stop'), hasLength(1));
+      expect(find.textContaining('Pilot connected.'), findsNothing);
+      expect(find.text('Alpaca Pilot stopped.'), findsOneWidget);
+      expect(device.closed, isFalse);
+    },
+  );
+  testWidgets(
+    'Failed Stop never reports success and closes the failed session',
+    (tester) async {
+      device.failStop = true;
+      await open(tester);
+      await tap(tester, 'Stop');
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.widgetWithText(FilledButton, 'Stop'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Alpaca Pilot stopped.'), findsNothing);
+      await expandDiagnosticDetails(tester);
+      expect(find.textContaining('connection lost during stop'), findsOneWidget);
+      expect(device.closed, isTrue);
     },
   );
   testWidgets('Connection loss removes stale successful installation state', (

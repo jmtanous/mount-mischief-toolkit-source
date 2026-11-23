@@ -63,7 +63,7 @@ void main() {
     await tester.tap(find.text('Catalog'));
     await enterMountWorkspace(tester);
     await tester.pumpAndSettle();
-    expect(find.text('Alpaca Pilot'), findsOneWidget);
+    expect(find.text('Alpaca Pilot'), findsNothing);
     expect(find.text('Sign in with GitHub'), findsNothing);
     expect(find.text('Refresh catalog'), findsOneWidget);
     await capture(tester, 'catalog');
@@ -78,7 +78,7 @@ void main() {
   });
 
   testWidgets(
-    'Damaged catalog and credentials still show bundled offline project',
+    'Damaged catalog preserves an empty offline state',
     (tester) async {
       SharedPreferences.setMockInitialValues({});
       FlutterSecureStorage.setMockInitialValues({'github_session': '{'});
@@ -104,8 +104,8 @@ void main() {
       await tester.tap(find.text('Catalog'));
       await enterMountWorkspace(tester);
       await tester.pumpAndSettle();
-      await waitForWidget(tester, find.text('Alpaca Pilot'));
-      expect(find.text('Alpaca Pilot'), findsOneWidget);
+      await waitForWidget(tester, find.textContaining('Saved catalog is invalid'));
+      expect(find.text('Alpaca Pilot'), findsNothing);
       expect(find.text('Sign in with GitHub'), findsNothing);
       expect(find.text('Refresh catalog'), findsOneWidget);
       expect(find.textContaining('Saved catalog is invalid'), findsOneWidget);
@@ -115,7 +115,7 @@ void main() {
   );
 
   testWidgets(
-    'Unavailable public catalog keeps refresh and bundled install available',
+    'Unavailable public catalog keeps refresh available',
     (tester) async {
       SharedPreferences.setMockInitialValues({});
       FlutterSecureStorage.setMockInitialValues({'github_token': 'test-token'});
@@ -151,7 +151,7 @@ void main() {
         find.textContaining('not available for public download'),
         findsOneWidget,
       );
-      expect(find.text('Alpaca Pilot'), findsOneWidget);
+      expect(find.text('Alpaca Pilot'), findsNothing);
     },
   );
 }

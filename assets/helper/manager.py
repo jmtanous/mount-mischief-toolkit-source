@@ -131,16 +131,47 @@ class Manager:
                 pass
         return state
 
+    def settings_snapshot(self, project, archive_hash):
+        if not isinstance(archive_hash, str) or not DIGEST.fullmatch(archive_hash):
+            raise ValueError('Invalid settings archive identity')
+        return safe_path(self.project(project), 'settings-by-release/'+archive_hash+'.json')
+
     def snapshot_settings(self, project):
         record = self.record(project)
         if record:
-            cfg = self.release(project)/'opt/alpaca-pilot-2.2/data/config.pilot.json'
-            if cfg.exists(): atomic(self.project(project)/'settings.json', read(cfg))
+            cfg = safe_path(self.release(project), 'opt/alpaca-pilot-2.2/data/config.pilot.json')
+            settings = read(cfg)
+            if settings is not None and not isinstance(settings, dict):
+                raise ValueError('Saved Pilot settings must be an object')
+            archive_hash = record['manifest']['sha256']
+            atomic(self.settings_snapshot(project, archive_hash), {
+                'schema': 1, 'archive_sha256': archive_hash, 'settings': settings,
+            })
+            latest = safe_path(self.project(project), 'settings.json')
+            if settings is None:
+                latest.unlink(missing_ok=True)
+            else:
+                atomic(latest, settings)
+
+    def settings_for_release(self, project, archive_hash):
+        snapshot = self.settings_snapshot(project, archive_hash)
+        if snapshot.exists():
+            saved = read(snapshot)
+            if not isinstance(saved, dict) or saved.get('schema') != 1 or saved.get('archive_sha256') != archive_hash:
+                raise ValueError('Invalid saved release settings')
+            settings = saved.get('settings')
+        else:
+            settings = read(safe_path(self.project(project), 'settings.json'))
+        if settings is not None and not isinstance(settings, dict):
+            raise ValueError('Saved Pilot settings must be an object')
+        return settings
 
     def clear_settings(self, project, active_release=None):
         directory = self.project(project)
         for name in ('settings.json', 'config-before-start.json'):
             safe_path(directory, name).unlink(missing_ok=True)
+        snapshots = safe_path(directory, 'settings-by-release')
+        if snapshots.exists(): shutil.rmtree(snapshots)
         # Retained rollback releases must not resurrect settings the user deleted.
         for release in (directory/'releases').glob('*'):
             if release.name != active_release:
@@ -206,7 +237,7 @@ class Manager:
         self.journal(operation, phase='verified')
         self.progress('activate')
         if keep:
-            saved = read(project_dir/'settings.json')
+            saved = self.settings_for_release(project, m['sha256'])
             if saved is not None: atomic(stage/'opt/alpaca-pilot-2.2/data/config.pilot.json', saved)
         target.parent.mkdir(parents=True,exist_ok=True)
         stage.rename(target)

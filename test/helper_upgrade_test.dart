@@ -48,6 +48,12 @@ class UpgradeDevice extends Benro {
 }
 
 void main() {
+  test('published build 11 remains inspectable before updating helpers', () async {
+    final d = UpgradeDevice()..hashes = Map.of(Benro.compatibleHelperSets.last);
+    final state = await d.inspect();
+    expect(state['setup_update_required'], isTrue);
+    expect((state['projects'] as List).single['running'], isTrue);
+  });
   test(
     'exact prior helper set exposes running projects and update notice',
     () async {

@@ -4,6 +4,7 @@ import io
 import json
 from pathlib import Path
 import sys
+import shutil
 import tarfile
 import tempfile
 import unittest
@@ -91,6 +92,52 @@ class PackageTests(unittest.TestCase):
         self.assertFalse(previous.exists())
         self.assertFalse((self.manager.release('pilot')/'opt/alpaca-pilot-2.2/data/config.pilot.json').exists())
         self.assertFalse((self.manager.project('pilot')/'settings.json').exists())
+
+    def test_version_switch_restores_each_versions_own_settings(self):
+        first = self.install()
+        cfg = lambda: self.manager.release('pilot')/'opt/alpaca-pilot-2.2/data/config.pilot.json'
+        atomic(cfg(), {'location':'Beta site', 'legacy':True})
+        second = self.install('second','reinstall',True)
+        self.assertEqual(json.loads(cfg().read_text())['location'],'Beta site')
+        atomic(cfg(), {'location':'New release site', 'new_field':42})
+        # Select the exact old archive again, with a new operation ID.
+        shutil.copyfile(self.root/'inbox/first.tar.gz', self.root/'inbox/back.tar.gz')
+        self.manager.dispatch({'op':'reinstall','project':'pilot','operation':'back','manifest':first['manifest'],'keep_settings':True})
+        self.assertEqual(json.loads(cfg().read_text()), {'location':'Beta site','legacy':True})
+        shutil.copyfile(self.root/'inbox/second.tar.gz', self.root/'inbox/forward.tar.gz')
+        self.manager.dispatch({'op':'reinstall','project':'pilot','operation':'forward','manifest':second['manifest'],'keep_settings':True})
+        self.assertEqual(json.loads(cfg().read_text()), {'location':'New release site','new_field':42})
+
+    def test_failed_upgrade_preserves_active_settings_and_snapshot(self):
+        first=self.install()
+        cfg=self.manager.release('pilot')/'opt/alpaca-pilot-2.2/data/config.pilot.json'
+        atomic(cfg,{'location':'Original'})
+        original=atomic
+        def fail_activation(path,value):
+            if path.name=='installed.json' and value['release']=='second': raise OSError('power loss')
+            original(path,value)
+        with patch('manager.atomic',side_effect=fail_activation):
+            with self.assertRaises(OSError): self.install('second','reinstall',True)
+        self.assertEqual(self.manager.record('pilot'),first)
+        self.assertEqual(json.loads(cfg.read_text()),{'location':'Original'})
+        self.assertEqual(self.manager.settings_for_release('pilot',first['manifest']['sha256']),{'location':'Original'})
+
+    def test_delete_settings_removes_release_snapshots(self):
+        self.install()
+        cfg=self.manager.release('pilot')/'opt/alpaca-pilot-2.2/data/config.pilot.json'
+        atomic(cfg,{'location':'Old'})
+        self.install('second','reinstall',True)
+        self.assertTrue((self.manager.project('pilot')/'settings-by-release').exists())
+        self.install('third','reinstall',False)
+        self.assertFalse((self.manager.project('pilot')/'settings-by-release').exists())
+
+    def test_absent_old_settings_does_not_import_new_configuration_on_return(self):
+        first=self.install()
+        self.install('second','reinstall',True)
+        atomic(self.manager.release('pilot')/'opt/alpaca-pilot-2.2/data/config.pilot.json', {'new_only':1})
+        shutil.copyfile(self.root/'inbox/first.tar.gz',self.root/'inbox/back.tar.gz')
+        self.manager.dispatch({'op':'reinstall','project':'pilot','operation':'back','manifest':first['manifest'],'keep_settings':True})
+        self.assertFalse((self.manager.release('pilot')/'opt/alpaca-pilot-2.2/data/config.pilot.json').exists())
 
     def test_explicit_choice_required(self):
         self.install()

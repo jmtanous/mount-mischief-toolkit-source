@@ -166,7 +166,7 @@ void main() {
   test('Pilot handover releases the existing paired heartbeat', () async {
     await device.keepDeviceAwake();
     final updates = <StartupEvent>[];
-    final result = await device.start('pilot', site, onProgress: updates.add);
+    final result = await device.start('alpaca-pilot', site, onProgress: updates.add);
     expect(updates.map((e) => e.stage).toSet().toList(), StartupStage.values);
     expect(updates.where((e) => e.responseReceived), hasLength(3));
     expect(result['pilot']['connected'], isTrue);
@@ -184,7 +184,7 @@ void main() {
     () async {
       device.states.insert(1, {'running': true});
       final updates = <StartupEvent>[];
-      await device.start('pilot', site, onProgress: updates.add);
+      await device.start('alpaca-pilot', site, onProgress: updates.add);
       expect(
         updates.where(
           (e) => e.stage == StartupStage.waiting && e.responseReceived,
@@ -198,7 +198,7 @@ void main() {
 
   test('Invalid site is rejected before all remote work', () async {
     await expectLater(
-      device.start('pilot', Site('Invalid', double.nan, 0, 0)),
+      device.start('alpaca-pilot', Site('Invalid', double.nan, 0, 0)),
       throwsArgumentError,
     );
     expect(events, isEmpty);
@@ -208,7 +208,7 @@ void main() {
     'Existing managed process is not restarted or given a second heartbeat',
     () async {
       device.states[0] = {'running': true};
-      expect(await device.start('pilot', site), {'running': true});
+      expect(await device.start('alpaca-pilot', site), {'running': true});
       expect(events, ['inspect']);
     },
   );
@@ -220,7 +220,7 @@ void main() {
       } else {
         device.clients = 1;
       }
-      await expectLater(device.start('pilot', site), throwsStateError);
+      await expectLater(device.start('alpaca-pilot', site), throwsStateError);
       expect(events, isNot(contains('heartbeat:start')));
       expect(events, isNot(contains('start')));
       expect(events, isNot(contains('stop')));
@@ -231,7 +231,7 @@ void main() {
     'Start holds heartbeat until API readiness then connects Pilot',
     () async {
       final before = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
-      final result = await device.start('pilot', site);
+      final result = await device.start('alpaca-pilot', site);
       expect(result['pilot']['connected'], isTrue);
       expect(events, [
         'inspect',
@@ -247,7 +247,7 @@ void main() {
         'heartbeat:close',
       ]);
       final request = device.requests.singleWhere((r) => r['op'] == 'start');
-      expect(request['project'], 'pilot');
+      expect(request['project'], 'alpaca-pilot');
       expect(request['site'], site.toJson());
       expect(request['epoch'], greaterThanOrEqualTo(before));
       expect(request['operation'], matches(RegExp(r'^op-[a-f0-9]{32}$')));
@@ -260,7 +260,7 @@ void main() {
     () async {
       device.heartbeat.failStart = true;
       await expectLater(
-        device.start('pilot', site),
+        device.start('alpaca-pilot', site),
         throwsA(isA<SocketException>()),
       );
       expect(events, isNot(contains('start')));
@@ -273,7 +273,7 @@ void main() {
     'Heartbeat loss after launch stops the owned project before exit',
     () async {
       device.heartbeat.failCheck = true;
-      await expectLater(device.start('pilot', site), throwsStateError);
+      await expectLater(device.start('alpaca-pilot', site), throwsStateError);
       expect(
         events,
         containsAllInOrder([
@@ -291,7 +291,7 @@ void main() {
     device.states[1] = {'running': false};
     final updates = <StartupEvent>[];
     await expectLater(
-      device.start('pilot', site, onProgress: updates.add),
+      device.start('alpaca-pilot', site, onProgress: updates.add),
       throwsStateError,
     );
     expect(updates.last.cleanup, StartupCleanup.confirmed);
@@ -309,7 +309,7 @@ void main() {
     device.failures['stop'] = TimeoutException('cleanup reply lost');
     final updates = <StartupEvent>[];
     await expectLater(
-      device.start('pilot', site, onProgress: updates.add),
+      device.start('alpaca-pilot', site, onProgress: updates.add),
       throwsA(same(failure)),
     );
     expect(updates.where((e) => e.cleanup != null).map((e) => e.cleanup), [

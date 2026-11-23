@@ -1,0 +1,33 @@
+{
+  "version": "0.1.0-rc.3",
+  "build": 12,
+  "apk_sha256": "6ac9b5aeb5f4581c805e7a237594f5a2d0f3a5a7b1c993613fd7f59d7a4194de",
+  "apk_bytes": 61400734,
+  "signer_sha256": "868c4b51f7da0e23fb0277149fefac96808e37e42852219e5264d00f1b61fa68",
+  "signature_verification": "passed",
+  "bundled_projects": 0,
+  "runtime_sha256": "131b8458fe77d604c929bc2059cb737263096e42b63b7d12a6dcd5284cfc2b0c",
+  "runtime_notices": 301,
+  "flutter_tests": 118,
+  "analysis": "no issues",
+  "physical_acceptance": true,
+  "published": false,
+  "arm_full_archive_install_upgrade_rollback": "passed",
+  "standalone_runtime_recovery_arm": "passed",
+  "public_source_build_without_archives": "passed",
+  "existing_sd_acceptance": {
+    "result": "passed core checks after connection recovery",
+    "receipt": "docs/existing-sd-build12-acceptance.json",
+    "fresh_sd": false,
+    "post_stop_network_repeat": "passed for 134 seconds; earlier incident cause unresolved"
+  },
+  "physical_acceptance_scope": {
+    "scope": "stationary existing-SD upgrade/rollback and clean Toolkit directory on existing filesystem",
+    "result": "passed; one recovered network incident did not recur in monitored repeat",
+    "receipt": "docs/ATTENDED-ACCEPTANCE.md",
+    "freshly_formatted_card": false,
+    "public_downloads": false,
+    "post_stop_keepalive_seconds": 134.379,
+    "motor_or_observing_accuracy": false
+  }
+}

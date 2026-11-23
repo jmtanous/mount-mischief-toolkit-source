@@ -10,6 +10,13 @@ import 'package:http/testing.dart';
 import 'package:mount_mischief_toolkit/catalog.dart';
 import 'package:mount_mischief_toolkit/models.dart';
 
+class RuntimeCatalog extends Catalog {
+  final ProjectManifest runtime;
+  RuntimeCatalog({required this.runtime, required super.cacheDirectory, required super.client});
+  @override
+  Future<ProjectManifest> runtimeManifest() async => runtime;
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late Directory temp;
@@ -18,26 +25,76 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({'github_token': 'test-token'});
   });
   tearDown(() => temp.deleteSync(recursive: true));
-  test('Fresh install extracts and verifies bundled Pilot without any network request', () async {
-    FlutterSecureStorage.setMockInitialValues({});
-    final client = Catalog(
-      cacheDirectory: temp,
-      client: MockClient((request) async {
-        fail('Bundled installation attempted network access: ${request.url}');
-      }),
-    );
-    final seed = (await client.cached()).single;
-    final archive = await client.download(seed, (_, _) {});
-    expect(await archive.length(), seed.bytes);
-    expect(await client.available(seed), isTrue);
-    expect((await client.bootstrap()).path, archive.path);
+  test('Download plan counts missing packages and reports combined progress', () async {
+    final seed = Map<String, dynamic>.from(jsonDecode(File('assets/catalog.json').readAsStringSync())['projects'][0] as Map);
+    final projectBytes = utf8.encode('project fixture');
+    final runtimeBytes = utf8.encode('runtime fixture');
+    final project = ProjectManifest({...seed, 'sha256': sha256.convert(projectBytes).toString(), 'archive_bytes': projectBytes.length, 'asset_id': 2});
+    final runtime = ProjectManifest({...seed, 'id': 'toolkit-runtime', 'adapter': 'toolkit-runtime-v1', 'resources': <String>[], 'sha256': sha256.convert(runtimeBytes).toString(), 'archive_bytes': runtimeBytes.length, 'asset_id': 1});
+    final requests = <String>[];
+    final catalog = RuntimeCatalog(runtime: runtime, cacheDirectory: temp, client: MockClient((request) async {
+      requests.add(request.url.path);
+      return http.Response.bytes(request.url.path.endsWith('/1') ? runtimeBytes : projectBytes, 200);
+    }));
+    addTearDown(catalog.close);
+    final total = projectBytes.length + runtimeBytes.length;
+    expect(await catalog.requiredDownloadBytes(project), total);
+    final progress = <int>[];
+    await catalog.prepare(project, (done, size) { expect(size, total); progress.add(done); });
+    expect(requests, hasLength(2));
+    expect(progress.last, total);
+    expect(progress, orderedEquals([...progress]..sort()));
+    expect(await catalog.ready(project), isTrue);
+    expect(await catalog.requiredDownloadBytes(project), 0);
+    await catalog.prepare(project, (_, _) => fail('Cached packages should not transfer'));
+    expect(requests, hasLength(2));
+    await (await catalog.path(project)).delete();
+    expect(await catalog.requiredDownloadBytes(project), projectBytes.length);
+  });
+  test(
+    'Uncached old version explains offline recovery without downloading',
+    () async {
+      final client = Catalog(
+        cacheDirectory: temp,
+        client: MockClient(
+          (_) async => fail('Offline lookup attempted network access'),
+        ),
+      );
+      addTearDown(client.close);
+      final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).single;
+      final old = ProjectManifest({
+        ...seed.json,
+        'version': '0.0.1',
+        'sha256': '0' * 64,
+      });
+      await expectLater(
+        client.bundled(old),
+        throwsA(
+          isA<StateError>()
+              .having(
+                (e) => e.message,
+                'message',
+                contains('0.0.1 is not available offline'),
+              )
+              .having((e) => e.message, 'recovery', contains('Change version')),
+        ),
+      );
+      expect(await client.available(old), isFalse);
+    },
+  );
+  test('Fresh install has an empty catalog and cannot extract Pilot', () async {
+    final client = Catalog(cacheDirectory: temp);
+    expect(await client.cached(), isEmpty);
+    expect(client.cacheNotice, contains('Connect to the internet'));
+    final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).single;
+    await expectLater(client.bundled(seed), throwsStateError);
     client.close();
   });
   test(
     'Damaged catalog metadata falls back offline and preserves package files',
     () async {
       final client = Catalog(cacheDirectory: temp);
-      final seed = (await client.cached()).first;
+      final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).first;
       final file = File('${(await client.directory).path}/catalog.json');
       final package = await client.path(seed);
       await package.writeAsString('existing package bytes');
@@ -63,8 +120,8 @@ void main() {
       ]) {
         await file.writeAsString(damaged);
         final fallback = await client.cached();
-        expect(fallback.single.hash, seed.hash);
-        expect(client.cacheNotice, contains('Showing the bundled project'));
+        expect(fallback, isEmpty);
+        expect(client.cacheNotice, contains('Refresh the catalog'));
         expect(await package.readAsString(), 'existing package bytes');
         expect(await file.readAsString(), damaged);
       }
@@ -90,7 +147,7 @@ void main() {
       ]) {
         FlutterSecureStorage.setMockInitialValues({'github_session': value});
         final client = Catalog(cacheDirectory: temp);
-        expect((await client.cached()).single.id, 'alpaca-pilot');
+        expect(await client.cached(), isEmpty);
         expect(await client.storage.read(key: 'github_session'), isNull);
         client.close();
       }
@@ -164,11 +221,11 @@ void main() {
             isA<HttpException>().having(
               (e) => e.message,
               'message',
-              allOf(contains('cached'), isNot(contains('Sign in'))),
+              allOf(contains('Cached'), isNot(contains('Sign in'))),
             ),
           ),
         );
-        expect((await client.cached()).single.hash, before.single.hash);
+        expect(await client.cached(), before);
         client.close();
       },
     );
@@ -183,7 +240,7 @@ void main() {
         'ssh_identity_fixture': 'keep',
       });
       final client = Catalog(cacheDirectory: temp);
-      final seed = (await client.cached()).single;
+      final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).single;
       final file = await client.path(seed);
       await file.writeAsString('keep package');
       await client.cached();
@@ -206,7 +263,7 @@ void main() {
         expect(request.method, 'GET');
         expect(
           request.url.path,
-          '/repos/jmtanous/mount-mischief-toolkit-source/contents/catalog.json',
+          '/repos/jmtanous/mount-mischief-toolkit-source/contents/catalog-v2.json',
         );
         expect(request.headers.containsKey('Authorization'), isFalse);
         return http.Response(
@@ -231,7 +288,7 @@ void main() {
       cacheDirectory: temp,
       client: MockClient((_) async => throw const SocketException('offline')),
     );
-    final seed = (await client.cached()).single;
+    final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).single;
     final manifest = ProjectManifest({
       ...seed.json,
       'sha256': sha256.convert(payload).toString(),
@@ -275,7 +332,7 @@ void main() {
       ),
     );
     await expectLater(client.refresh(), throwsFormatException);
-    expect((await client.cached()).first.id, 'alpaca-pilot');
+    expect(client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).first.id, 'alpaca-pilot');
     client.close();
   });
   test('Invalid project digest is rejected', () {
@@ -306,7 +363,7 @@ void main() {
         return http.Response.bytes(payload, 200);
       }),
     );
-    final seed = (await client.cached()).first;
+    final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).first;
     final manifest = ProjectManifest({
       ...seed.json,
       'asset_id': 123,
@@ -326,7 +383,7 @@ void main() {
         (request) async => http.Response.bytes([1, 2, 3], 200),
       ),
     );
-    final seed = (await client.cached()).first;
+    final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).first;
     final manifest = ProjectManifest({
       ...seed.json,
       'asset_id': 123,
@@ -366,7 +423,7 @@ void main() {
         return http.StreamedResponse(Stream.value(payload), 200);
       }),
     );
-    final seed = (await client.cached()).first;
+    final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).first;
     final manifest = ProjectManifest({
       ...seed.json,
       'asset_id': 1,
@@ -398,7 +455,7 @@ void main() {
             (_, _) async => http.StreamedResponse(response(), 200),
           ),
         );
-        final seed = (await client.cached()).first;
+        final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).first;
         final manifest = ProjectManifest({
           ...seed.json,
           'asset_id': 1,
@@ -425,7 +482,7 @@ void main() {
       cacheDirectory: temp,
       client: MockClient((_) async => http.Response('', 404)),
     );
-    final seed = (await client.cached()).single;
+    final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).single;
     await expectLater(
       client.download(
         ProjectManifest({...seed.json, 'asset_id': 1}),
@@ -439,7 +496,7 @@ void main() {
         ),
       ),
     );
-    expect((await client.cached()).single.hash, seed.hash);
+    expect(client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).single.hash, seed.hash);
     client.close();
   });
 
@@ -454,7 +511,7 @@ void main() {
           (_) async => http.Response('', 302, headers: {'location': redirect}),
         ),
       );
-      final seed = (await client.cached()).single;
+      final seed = client.decodeCatalog(File('assets/catalog.json').readAsStringSync()).single;
       await expectLater(
         client.download(
           ProjectManifest({...seed.json, 'asset_id': 1}),

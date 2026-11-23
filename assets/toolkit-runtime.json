@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "toolkit-runtime",
+  "name": "Toolkit runtime",
+  "version": "1.0.0",
+  "adapter": "toolkit-runtime-v1",
+  "min_manager_schema": 1,
+  "devices": [
+    "benro-polaris"
+  ],
+  "sha256": "131b8458fe77d604c929bc2059cb737263096e42b63b7d12a6dcd5284cfc2b0c",
+  "manifest_sha256": "bf3279300947415e91047d861968b6b395ea3ee1efb4978dca676ed75a1ad9bc",
+  "archive_bytes": 14342425,
+  "unpacked_bytes": 42050655,
+  "resources": []
+}

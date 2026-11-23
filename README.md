@@ -1,35 +1,60 @@
 # Mount Mischief Toolkit
 
-An independent Android app for managing projects on compatible field hardware.
-The initial target is Benro Polaris, with Alpaca Pilot 2.2 Beta 8 support.
-Not affiliated with or endorsed by Benro or oGecko Solutions.
+Independent Android project manager for compatible field hardware.
+**Not affiliated with or endorsed by Benro.** The initial hardware profile is
+Benro Polaris; Alpaca Pilot has a dedicated compiled integration. The catalog
+selects compatible Beta 8 and 2.2.0 packages independently of MMT.
 
-**Experimental release candidate.** Get the production-signed APK from
-[GitHub Releases](https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/v0.1.0-rc.2).
-Read the [tested scope and known limitations](RELEASE-CANDIDATE.md).
+## Development status
 
-## What it does
+Implemented locally: Device/Catalog/Installed screens, anonymous public catalog access, verified offline caching, per-address SSH pairing,
+SD package management, operation journals, and Pilot lifecycle integration.
+The current decoupled candidate passes local and ARM VM checks. Historical
+phone evidence below applies to build 11; build 12 still needs attended acceptance.
+Pixel pairing, foreground heartbeat,
+SD setup repair and Alpaca installation are verified on Polaris. Pilot opens
+inside Toolkit over the device Wi-Fi. See `docs/IMPLEMENTATION.md` for current
+hardware evidence and remaining observing checks.
 
-- Discovers Polaris over Bluetooth and attempts to wake its Wi-Fi.
-- Shows the phone's Wi-Fi association and verifies mount identity through SSH pairing.
-- Installs, inspects, starts, stops and removes supported projects on the SD card.
-- Shows Pilot startup stages and opens its interface inside the app.
-- Offers a foreground-only Keep screen awake setting.
+Firmware modification/restoration, boot integration, automatic updates and
+unmanaged-controller takeover are outside this version.
 
-The app does not flash firmware or change boot configuration. Install does not
-start Pilot. Starting Pilot applies the confirmed observing site and phone time,
-then connects the driver to the mount. Alignment and observing controls remain
-in Pilot. Experimental software can fail or damage equipment; keep operations
-attended and have a recovery path.
+## User workflow
 
-## Basic workflow
+On each cold launch, review the experimental-use warning, acknowledge the risk,
+and choose **Benro Polaris**. The Polaris workspace then guides power-on,
+Bluetooth wake, Wi-Fi joining and pairing. Returning from Android settings or
+Pilot does not repeat the welcome screen. **Change mount** returns to the chooser
+and releases MMT pairing without stopping a running Pilot project.
 
-1. Accept the experimental-use notice and select Polaris.
-2. Obtain the project package while internet access is available.
-3. Power on Polaris, wake its Wi-Fi if needed, and join its Wi-Fi in Android settings.
-4. Return to MMT and choose Pair and inspect. Review the SSH identity prompt.
-5. Install Pilot, then select Start and confirm the observing site.
-6. Wait for startup verification, then choose Open Pilot.
+The optional **Buy me a beer** action appears on Welcome and About. It opens
+https://buymeacoffee.com/jmtanousk in the external browser. The destination can
+be overridden with `--dart-define=SUPPORT_URL`.
+See `docs/APP-DESIGN.md` for configuration and UI verification.
+
+1. Open Catalog. No GitHub account or sign-in is required.
+2. Select and download a project version while internet access is available.
+   MMT ships without projects. The first download also prepares the separate
+   Toolkit runtime; the displayed total includes both uncached archives.
+3. If Polaris Wi-Fi is asleep, use **Wake Wi-Fi**, select your mount, then
+   join its Wi-Fi through Android settings and pair and inspect it. Bluetooth
+   wake and subsequent pairing have passed an attended Pixel check; further
+   recovery scenarios remain pending.
+   See `docs/BLUETOOTH-WAKE.md` for the flow and attended checklist.
+   Confirm its SSH fingerprint on first pairing; later changes are blocked.
+   While paired in the foreground, Toolkit keeps idle device Wi-Fi and the phone
+   screen awake. **Disconnect** releases this heartbeat. Existing controllers
+   keep their own connection; Toolkit does not take them over.
+   If setup was interrupted or helpers no longer match this app, use **Repair
+   Toolkit setup**. Repair preserves project files/settings and retains a
+   replaced runtime for inspection.
+4. Install the selected project. Installation does not start it.
+5. Start Pilot after reviewing the observing location. Toolkit synchronizes the
+   device clock and transfers its temporary heartbeat to Pilot.
+6. Tap **Open Pilot** to use its interface inside Toolkit. Press Android Back
+   to return to Installed; controls become available after the status refresh.
+   Once startup succeeds, Pilot continues running when Toolkit closes.
+   Alignment and observing controls remain in Pilot.
 
 The Pilot browser preserves its page when the phone rotates. Mount traffic stays
 on Polaris Wi-Fi; public map and site lookup requests use a validated internet
@@ -41,36 +66,118 @@ disabled because it can identify the wrong observing site. If location or intern
 is unavailable, a message explains the problem; coordinates can still be entered
 manually. User-selected external links open in the phone's normal browser.
 
-“No internet” on Polaris Wi-Fi is normal. Android may switch to another network;
-check the association indicator if pairing fails. Wi-Fi wake requires the mount
-to be powered on. Keep MMT open during operations. An SSH timeout does not prove
-remote work stopped: reconnect and inspect before retrying. Reinstall/uninstall
-asks whether to preserve settings. Existing unmanaged installations are not adopted.
+Keep Toolkit in the foreground and stay on the device network during operations.
+If Toolkit is holding the temporary heartbeat, backgrounding releases it and
+requires **Pair and inspect** on return. While Pilot holds its own connection,
+Toolkit retains the session and refreshes it on return. A connection error still
+requires fresh pairing to reconcile recorded operations before retrying.
+An SSH timeout does not prove that remote work stopped.
+
+Toolkit setup and package installation show a stage checklist. Setup names the
+runtime and helper steps; transfers show bytes sent. Package installation reports
+archive checks, unpacking counts, file verification counts, activation, and the
+final status refresh. Counts apply to the current step, not the whole operation.
+Keep MMT open and stay connected while installation runs; SD work can take several
+minutes. On failure, the checklist retains the failed step and error details stay
+available below it. Installation never starts the project automatically.
+
+Reinstall and uninstall always ask whether to keep or delete saved settings.
+Reinstall uses the installed version. Other installed projects remain separate;
+exclusive resources prevent conflicting projects from starting together.
+Existing unmanaged installations are not adopted, overwritten, or removed.
+
+If saved catalog metadata is damaged, Toolkit shows an offline-recovery notice.
+Refresh when internet access returns. Existing verified package files are
+preserved. Failed transfers discard their incomplete download so a retry can
+start cleanly. A fresh offline installation has an empty catalog.
 
 ## Build and test
 
-See [BUILDING.md](BUILDING.md). The upstream runtime is not committed; an exact
-hash-matching archive must be supplied before Flutter asset builds/tests.
-No GitHub account is required. The public catalog defaults to
-`jmtanous/mount-mischief-toolkit-source`; the root `catalog.json` lists the released package. Bundled or cached packages
-remain usable without internet. Upgrading removes old GitHub credentials while
-preserving SSH pairing, preferences and packages.
+The current development SDK is Flutter 3.50.1 (Dart 3.14), Android SDK 36, JDK 17,
+and NDK 28.2.13676358. `scripts/flutter.sh` uses the isolated SDK/cache directory
+`../.benro-android-tools`. On another machine, use your own Flutter installation.
 
-Distribution uses production-signed APKs through GitHub Releases. Google Play
-submission is outside the current plan.
+```sh
+./scripts/flutter.sh pub get
+./scripts/flutter.sh analyze
+./scripts/flutter.sh test
+python -B -m unittest discover -s test -p 'test_*.py'
+./scripts/flutter.sh build apk --debug
+```
 
-## License and credits
+When the existing private ARM lab is available, `scripts/test-arm-vm.sh` runs
+the Python suite in its captured userspace. `scripts/test-setup-vm.sh` exercises
+the app's actual setup commands, interrupted activation and runtime repair in
+a disposable directory in that VM. Neither script contacts physical hardware.
 
-Original contributions are copyright (c) 2026 Jose Mtanous, under [MIT](LICENSE).
-Upstream Pilot, libraries, fonts and other third-party assets retain their own
-licenses. About & support → Open-source licenses displays the corresponding notices.
-See [third-party notices](assets/legal/THIRD-PARTY-NOTICES.md) and the unchanged
-[upstream license](assets/legal/alpaca-UPSTREAM-LICENSE.txt).
+`docs/ANDROID-VALIDATION.md` describes the dedicated Android emulator, verified
+offline restart and native settings/browser handoff checks.
 
-Support is optional: [Buy me a beer](https://buymeacoffee.com/jmtanousk).
+To override the public catalog host:
 
-## Installation progress
+```sh
+./scripts/flutter.sh build apk --debug \
+  --dart-define=CATALOG_OWNER=jmtanous \
+  --dart-define=CATALOG_REPO=mount-mischief-toolkit-source
+```
 
-Toolkit setup names its runtime and helper steps. Package installation shows a checklist, transfer bytes, unpacking and verification file counts, activation, and status refresh. Counts apply to the current step, not the whole operation. Keep MMT open and connected; SD installation can take several minutes. Failures retain the last stage with error details below. Installation does not start the project.
+Catalog refresh and release downloads are anonymous. The app fetches
+`catalog-v2.json` from the existing public MMT source repository and caches
+verified packages for offline installation. The staged v2 catalog remains a
+release draft until its new runtime and Pilot asset IDs have been assigned and
+verified. Legacy `catalog.json` remains available for published build 11.
 
-Known compatible older Toolkit helpers retain installed-project and Stop controls. MMT offers a tools update once managed projects are stopped and other controllers disconnect. Missing, mixed, or unknown helper sets still require setup repair.
+Distribution is through production-signed APKs on GitHub Releases after review.
+Google Play submission is not planned. Build source and APKs contain no project
+archive. Local archive fixtures are ignored and are only needed for packaging
+or integration tests. Do not commit captures, credentials or generated binaries.
+
+## Catalog and package contract
+
+Catalog schema 2 contains `projects` and a separate `runtime` descriptor. Downloads
+use immutable GitHub release `asset_id` values with optional `asset_owner` and
+`asset_repo`. Requests never include credentials, including redirects. Compatible
+project versions share one card with a version selector. New applications need a
+dedicated compiled integration and an MMT release; subsequent compatible versions
+only need package and catalog updates. See [integration contract](docs/PROJECT-INTEGRATIONS.md).
+
+Packages are gzip tar archives with a pinned `BUNDLE-MANIFEST.json`, containing
+regular files/directories only. Every file must appear in the manifest with its
+size and SHA-256. Project manifests declare archive size/hash, expanded size,
+manifest hash, supported devices, minimum manager schema, adapter, and exclusive
+resources. Unknown adapters require a manager update; there are no arbitrary
+installation scripts supplied by a catalog entry.
+
+Managed device files live under `/app/sd/mount-mischief-toolkit`. A separate
+bootstrap runtime keeps package-management Python available after uninstalling a
+project. Each project has independent releases, settings and process identity.
+Settings are saved per archive checksum before switching versions. A first-time
+upgrade carries settings forward; returning to an installed version restores its
+prior settings. Explicitly deleting settings clears all version snapshots.
+Old releases are retained until uninstall; abandoned staging directories are
+retained for diagnosis rather than guessed at and deleted automatically.
+
+The helper accepts one JSON request on stdin and emits one JSON result. Common
+fields are `op`, `project`, and `operation`; reinstall/uninstall require an explicit
+boolean `keep_settings`. Supported operations are `list`, `inspect`, `operation`,
+`stage`, `install`, `reinstall`, `uninstall`, `start`, `connect`, `stop`, and `logs`.
+
+## Validation boundaries
+
+Local unit tests and full-archive extraction do not establish hardware safety,
+physical controller timing, Android network behavior, or observing accuracy.
+Attended phone/device validation remains required. Pilot service readiness,
+controller connectivity and alignment are reported separately.
+
+## License
+
+Original contributions by Jose Mtanous are licensed under the [MIT License](LICENSE).
+Third-party code, dependencies, fonts, and other assets retain their own licenses.
+This license does not grant rights to third-party trademarks or imply endorsement.
+
+Downloaded Pilot packages retain their upstream oGecko copyright and license
+notices. About & support → Open-source licenses displays MMT, integration, font,
+Flutter dependency and Toolkit runtime notices. Runtime notices are collected
+from the pinned standalone archive with `python3 scripts/collect-runtime-licenses.py`.
+
+Known compatible older Toolkit helpers keep installed projects and Stop controls available. MMT offers “Update Toolkit tools” after managed projects are stopped and other controllers disconnect. Compatibility requires the complete audited helper set to match; missing, mixed, or unknown helpers still require setup repair.

@@ -1,7 +1,7 @@
 name: mount_mischief_toolkit
 description: Independent project manager for compatible field hardware.
 publish_to: none
-version: 0.1.0-rc.2+11
+version: 0.1.0-rc.3+12
 environment:
   sdk: '>=3.14.0 <4.0.0'
 dependencies:
@@ -26,8 +26,7 @@ flutter:
   assets:
     - LICENSE
     - assets/legal/
-    - assets/catalog.json
-    - assets/runtime/pilot.tar.gz
+    - assets/toolkit-runtime.json
     - assets/helper/
     - assets/branding/
     - assets/fonts/RedHatDisplay-OFL.txt

@@ -1,16 +1,11 @@
-# Local candidate validation
+# Source validation — build 12
 
-2026-11-21, MMT 0.1.0-rc.1 (build 2):
+An isolated checkout based on the existing public repository builds a debug APK
+without any project or Toolkit runtime archive. Its APK and the production-signed
+candidate both pass verify-release-inputs.py with zero bundled projects. The
+production signer matches build 11. All 118 Flutter tests and analysis pass.
 
-- Flutter analysis: no issues; full suite: 98 passed.
-- Python helper suite: 34 passed; Android unit suite: 8 passed.
-- Clean debug APK build passed; APK signature verifies as Android Debug.
-- Missing release credentials fail release builds, with no debug fallback.
-- Runtime/catalog/archive/manifest/version/notice checks passed, including exact
-  runtime, catalog, license registry and artwork bytes inside the APK.
-- New icon/welcome motto were previously inspected on the Pixel. The subsequent
-  runtime candidate has not been installed or physically tested unattended.
-- Runtime binaries and test outputs remain ignored. The public checkout contains
-  source, recipes and notices only. Changes are local and have not been pushed.
-
-See RELEASE-CANDIDATE.md and RELEASE-SIGNING.md for handoff requirements.
+The optional ARM lab also passed standalone setup/recovery and actual Beta 8 →
+2.2.0 → Beta 8 install/settings rollback. See docs/integration-validation.json.
+These checks do not constitute attended phone/mount acceptance. Published build
+11 evidence is preserved under docs/releases/mmt-build11.

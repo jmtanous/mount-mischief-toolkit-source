@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-23",
+  "updated_utc": "2026-11-23T19:27:08.065688+00:00",
+  "scope": "Owner-attended stationary acceptance on existing working SD; settings preserved",
+  "result": "Core existing-SD checks passed after connection recovery; full release acceptance remains open",
+  "mmt": {
+    "version": "0.1.0-rc.3",
+    "build": 12,
+    "apk_sha256": "6ac9b5aeb5f4581c805e7a237594f5a2d0f3a5a7b1c993613fd7f59d7a4194de",
+    "production_signed": true,
+    "debuggable": false,
+    "bundled_projects": 0
+  },
+  "phone": {
+    "model": "Pixel 11 Pro",
+    "android": "17",
+    "usb_stay_awake_original_restored": true
+  },
+  "mount": {
+    "kernel": "4.9.37",
+    "architecture": "armv7l",
+    "software": "6.0.0.54",
+    "hardware": "1.4.1.4",
+    "astro": "1.0.2.14",
+    "mode": 1
+  },
+  "delivery": "Private verified cache staging; exact production APK restored before acceptance; no public asset download claim",
+  "checks": {
+    "pairing": "passed with saved SSH identity after Bluetooth wake and explicit Android Wi-Fi join",
+    "toolkit_helper_update": "passed; original active settings byte-identical afterward; existing interpreter may have been reused",
+    "pilot220_install": "passed: all 4605 files verified, Keep settings",
+    "pilot220_settings": "semantically identical to original before and after confirmed startup",
+    "pilot220_start": "passed: MMT Pilot ready, managed process running and connected",
+    "driver_version": "2.2.0 Release in actual startup log",
+    "fresh_517_seconds": 0.49857366700007333,
+    "phone_pilot_dashboard": "rendered; connected indicator and live battery; photo-mode warning retained",
+    "cancel_stop": "passed: running service and connected banner retained",
+    "confirmed_stop": "passed: stopped/disconnected, stopped banner, clean shutdown in log",
+    "rollback_beta8": "passed on retry: all 4600 files verified; original archive identity restored",
+    "rollback_beta8_settings": "semantically identical to pre-test original",
+    "pilot220_snapshot": "retained and equal to last running settings",
+    "disconnect_repair": "passed: Beta 8 remains stopped after disconnect and re-pair"
+  },
+  "archive_sha256": {
+    "beta8": "30d34031d479505ce3f05a9cdabc6264f231ed7a2aec029edb0fff11c4467f1d",
+    "pilot220": "1e4fe3b33c0eeacafa85e9f4ae9e2558457e3bf38f22efee30529d4086a69520"
+  },
+  "findings": [
+    {
+      "id": "post-stop-connection-loss",
+      "observation": "First rollback failed during Toolkit helper preparation: mv exit not reported. No new package operation was staged; active 2.2.0 remained unchanged. Later pairing timed out. Bluetooth wake, explicit Wi-Fi join and re-pair recovered the session; retry completed.",
+      "root_cause": "not established",
+      "follow_up": "Repeat post-stop keepalive/network retention with diagnostics before clearing release acceptance."
+    },
+    {
+      "id": "offline-docs",
+      "observation": "Upstream attempted its optional offline documentation download at startup; DNS was unavailable on Polaris Wi-Fi. Dashboard and live status still loaded."
+    }
+  ],
+  "final_state": {
+    "installed_version": "2.2-beta8-port.0.1.0-rc.2",
+    "running": false,
+    "managed_process": false,
+    "controller_clients": 0,
+    "mmt_disconnected": true,
+    "original_settings_preserved": true,
+    "pilot220_snapshot_retained": true
+  },
+  "physical_motion_requested": false,
+  "firmware_or_boot_changes": false,
+  "tracking_observed": false,
+  "aligned_observed": false,
+  "published": false,
+  "not_validated": [
+    "fresh-SD standalone runtime installation",
+    "public catalog and release-asset downloads",
+    "repeat post-stop network retention without recovery",
+    "alignment, tracking, celestial accuracy and motor behavior",
+    "physical missing-old-package recovery fixture"
+  ],
+  "private_evidence": "Raw logs, screenshots, backups and settings remain private; this receipt omits coordinates and device identifiers"
+}
