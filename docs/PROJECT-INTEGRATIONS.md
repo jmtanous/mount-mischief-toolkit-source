@@ -28,9 +28,8 @@ Repository ownership:
 - One additional repository per new application, not per application version.
 
 Publish immutable package assets before enabling their catalog entries. The
-staged catalog-v2 is not ready to publish until the standalone runtime has a
-verified downloadable asset ID. v2.2.0 must not be listed before its dependency
-rebuild and acceptance tests pass. This document does not authorize publication.
+current catalog-v2 references verified public runtime and project assets. Future
+entries require dependency rebuild and acceptance checks before publication.
 
 ## Version ordering
 

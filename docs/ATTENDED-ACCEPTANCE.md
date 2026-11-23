@@ -34,9 +34,9 @@ of uninterrupted MMT keepalive after Pilot exited; a delayed device refresh also
 succeeded. The earlier connection drop did not recur, but its cause is unresolved.
 [Clean-install receipt](clean-install-build12-acceptance.json) contains exact results.
 
-Final state: Pilot 2.2.0 installed and stopped, MMT disconnected, zero controller
+State at the end of that test: Pilot 2.2.0 installed and stopped, MMT disconnected, zero controller
 connections. The confirmed site matches the original. The old installation and
-settings remain in the SD backup; Android's temporary USB stay-awake setting was
+settings remained in the SD backup at that time; Android's temporary USB stay-awake setting was
 restored. Private identifiers, coordinates, screenshots and logs are not published.
 
 ## Scope and release gates
@@ -47,8 +47,40 @@ celestial accuracy or motor behavior. The recovered network interruption remains
 an explicit known observation, not a claimed fix. Optional upstream offline docs
 could not download on Polaris Wi-Fi; the dashboard and status still worked.
 
-Public release-asset downloads remain untested because publication is not yet
-authorized and the new catalog lacks asset IDs. Source/package review artifacts
-are prepared locally; existing published releases and the legacy catalog are
-unchanged. Before catalog publication, upload the approved assets, verify their
-anonymous bytes/hashes and use their actual IDs. Beta 8 remains recommended.
+## Follow-up: genuinely empty card and public catalog
+
+After reporting a download/catalog failure, the owner supplied a card whose FAT
+filesystem had no Toolkit tree and only 416 KiB used out of approximately 30 GB.
+Production build 12 installed the standalone runtime and Pilot 2.2.0 from its
+verified phone cache. All 4,605 project files passed verification; MMT reported
+installation complete. An independent readback confirmed version
+2.2.0-port.0.2.0-rc.1 stopped. No Pilot startup was requested during this test.
+
+This is additional empty-card evidence; it does not establish how the card was
+formatted. The earlier on-card backup was absent on this card. Private local
+backups from the earlier test were preserved.
+
+The catalog endpoint returned HTTP 404 while publication was paused, preventing
+new clients from downloading packages. After the owner confirmed the failure was
+in download/catalog, the approved catalog was published. Anonymous retrieval now
+returns HTTP 200 and the exact verified catalog. Runtime and project release
+assets passed complete anonymous downloads and SHA-256 verification. The current
+catalog lists Pilot 2.2.0 first; build 13 selects the newest compatible version by
+default while preserving an explicit user choice. Beta 8 remains available.
+
+## Build 13 public download acceptance
+
+The exact production-signed build 13 was installed over the existing app. App
+data was backed up privately and only the four reproducible catalog/package
+cache files were cleared; pairing and other settings were retained. With internet
+available, the app automatically fetched the public catalog and selected Pilot
+2.2.0. It displayed 70.6 MiB for the missing standalone runtime plus project.
+Downloading completed successfully, and both archives passed the app's size and
+SHA-256 checks before it reported “Verified offline package.” No GitHub sign-in
+or private catalog staging was used. The released APK is not debuggable.
+
+Beta 8 also downloaded and verified through the public catalog. Its explicit
+selection survived refresh, and the picker listed 2.2.0 before Beta 8. The phone
+was left on production build 13 with both versions cached and 2.2.0 selected.
+Wi-Fi and the original USB stay-awake setting were restored. Pilot remained
+stopped after the empty-card install; MMT was disconnected.

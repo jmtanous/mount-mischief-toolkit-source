@@ -23,5 +23,12 @@
     "pilot220": 784337565,
     "beta8": 777637653
   },
-  "new_assets_verified_anonymously": true
+  "new_assets_verified_anonymously": true,
+  "catalog_public": true,
+  "catalog_sha256": "825d0a098e5d5adc75bb14b32dc0a848893432ff7f697818f5e8e36bf1638dcb",
+  "project_order": [
+    "2.2.0-port.0.2.0-rc.1",
+    "2.2-beta8-port.0.1.0-rc.2"
+  ],
+  "initial_selection": "newest compatible release"
 }

@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-23",
+  "app_build": 12,
+  "device": "Benro Polaris",
+  "phone": "Pixel 11 Pro, Android 17",
+  "baseline": {
+    "filesystem": "vfat",
+    "capacity_1k_blocks": 30516672,
+    "used_1k_blocks": 416,
+    "toolkit_present": false
+  },
+  "package_source": "verified phone cache",
+  "runtime_version": "1.0.0",
+  "pilot_version": "2.2.0-port.0.2.0-rc.1",
+  "verified_project_files": 4605,
+  "install_result": "passed",
+  "final_service": "stopped",
+  "pilot_started": false,
+  "format_performed_by_test": false,
+  "public_catalog_before_publication": 404,
+  "public_catalog_after_publication": 200,
+  "reported_failure_stage": "download/catalog",
+  "installer_failure_reproduced": false
+}
