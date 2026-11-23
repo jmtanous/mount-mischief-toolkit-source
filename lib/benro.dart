@@ -312,14 +312,25 @@ class Benro {
       ], eagerError: true);
       final write = () async {
         if (input != null) {
-          // A transport flush locks Dart's socket sink while the SSH channel
-          // can still emit packets. Stream through stdin without racing that
-          // independent writer; EOF and remote exit confirm completion.
-          final chunks = uploadChunks = StreamIterator(input);
-          while (await chunks.moveNext()) {
-            if (expired) throw TimeoutException('Upload expired');
-            session.write(Uint8List.fromList(chunks.current));
+          // addStream propagates the SSH channel's backpressure to the source.
+          // write() queues the whole upload when the remote window is full;
+          // draining that queue can monopolize the UI isolate doing encryption.
+          // Bound each write and yield to timers/touch events between chunks.
+          // Do not flush the shared socket: the transport has its own writer.
+          Stream<Uint8List> pacedInput() async* {
+            final chunks = uploadChunks = StreamIterator(input);
+            while (await chunks.moveNext()) {
+              final bytes = Uint8List.fromList(chunks.current);
+              for (var offset = 0; offset < bytes.length; offset += 16 * 1024) {
+                if (expired) throw TimeoutException('Upload expired');
+                yield Uint8List.sublistView(
+                  bytes, offset, min(offset + 16 * 1024, bytes.length),
+                );
+                await Future<void>.delayed(Duration.zero);
+              }
+            }
           }
+          await session.stdin.addStream(pacedInput());
         }
         await session.stdin.close();
         await session.done;

@@ -1,0 +1,93 @@
+{
+  "verified_utc": "2026-11-23T20:31:22.310581+00:00",
+  "mmt": {
+    "repository": "jmtanous/mount-mischief-toolkit-source",
+    "tag": "v0.1.0-rc.3",
+    "release_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/v0.1.0-rc.3",
+    "anonymous": true,
+    "assets": [
+      {
+        "name": "SHA256SUMS",
+        "asset_id": 784434773,
+        "bytes": 201,
+        "sha256": "5de910401059849c319453106a34932e13d43fd4b6fe01ccbcb9dc1dc85bd8de",
+        "api_url": "https://api.github.com/repos/jmtanous/mount-mischief-toolkit-source/releases/assets/784434773",
+        "browser_download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/v0.1.0-rc.3/SHA256SUMS",
+        "anonymous": true,
+        "download_host": "release-assets.githubusercontent.com"
+      },
+      {
+        "name": "mmt-rc.3-source.tar.gz",
+        "asset_id": 784434767,
+        "bytes": 3256617,
+        "sha256": "e1df248a6104271cf37b101ca48ab79cde744cc55bb386027c7da96aabe838d4",
+        "api_url": "https://api.github.com/repos/jmtanous/mount-mischief-toolkit-source/releases/assets/784434767",
+        "browser_download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/v0.1.0-rc.3/mmt-rc.3-source.tar.gz",
+        "anonymous": true,
+        "download_host": "release-assets.githubusercontent.com"
+      },
+      {
+        "name": "mount-mischief-toolkit-0.1.0-rc.3-build13.apk",
+        "asset_id": 784434770,
+        "bytes": 61400734,
+        "sha256": "7946faee505600712f832adc0565bb016b58652b1da7dd2d67e7f751f341e586",
+        "api_url": "https://api.github.com/repos/jmtanous/mount-mischief-toolkit-source/releases/assets/784434770",
+        "browser_download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/v0.1.0-rc.3/mount-mischief-toolkit-0.1.0-rc.3-build13.apk",
+        "anonymous": true,
+        "download_host": "release-assets.githubusercontent.com"
+      }
+    ]
+  },
+  "runtime": {
+    "repository": "jmtanous/mount-mischief-toolkit-source",
+    "tag": "toolkit-runtime-v1.0.0",
+    "release_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/toolkit-runtime-v1.0.0",
+    "anonymous": true,
+    "assets": [
+      {
+        "name": "SHA256SUMS",
+        "asset_id": 784333876,
+        "bytes": 207,
+        "sha256": "6a55fe3e841ff250375349c57a1d0c7fe59b4cc924840b3e449c311dc12f9585",
+        "api_url": "https://api.github.com/repos/jmtanous/mount-mischief-toolkit-source/releases/assets/784333876",
+        "browser_download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/toolkit-runtime-v1.0.0/SHA256SUMS",
+        "anonymous": true,
+        "download_host": "release-assets.githubusercontent.com"
+      },
+      {
+        "name": "toolkit-runtime-1.0.0-source-companion.tar.gz",
+        "asset_id": 784333873,
+        "bytes": 80968227,
+        "sha256": "dce24dd9e518c082bd90ed6196551bb892d4491d13c45766480cbfa5652c25e7",
+        "api_url": "https://api.github.com/repos/jmtanous/mount-mischief-toolkit-source/releases/assets/784333873",
+        "browser_download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/toolkit-runtime-v1.0.0/toolkit-runtime-1.0.0-source-companion.tar.gz",
+        "anonymous": true,
+        "download_host": "release-assets.githubusercontent.com"
+      },
+      {
+        "name": "toolkit-runtime-1.0.0.tar.gz",
+        "asset_id": 784333878,
+        "bytes": 14342425,
+        "sha256": "131b8458fe77d604c929bc2059cb737263096e42b63b7d12a6dcd5284cfc2b0c",
+        "api_url": "https://api.github.com/repos/jmtanous/mount-mischief-toolkit-source/releases/assets/784333878",
+        "browser_download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/toolkit-runtime-v1.0.0/toolkit-runtime-1.0.0.tar.gz",
+        "anonymous": true,
+        "download_host": "release-assets.githubusercontent.com"
+      }
+    ]
+  },
+  "catalog": {
+    "anonymous": true,
+    "url": "https://api.github.com/repos/jmtanous/mount-mischief-toolkit-source/contents/catalog-v2.json",
+    "http_status": 200,
+    "git_blob_sha": "3672f3617338b108844cbb74c6639010f62ea7f4",
+    "sha256": "825d0a098e5d5adc75bb14b32dc0a848893432ff7f697818f5e8e36bf1638dcb",
+    "project_versions": [
+      "2.2.0-port.0.2.0-rc.1",
+      "2.2-beta8-port.0.1.0-rc.2"
+    ]
+  },
+  "source_snapshot_matches_tag_commit": "13344a75f5caa52fec7d305af153ee6d95333780",
+  "attended_validation": "docs/ATTENDED-ACCEPTANCE.md",
+  "release_validation": "docs/build13-release-validation.json"
+}

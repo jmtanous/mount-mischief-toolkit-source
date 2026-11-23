@@ -7,14 +7,15 @@ selects compatible Beta 8 and 2.2.0 packages independently of MMT.
 
 ## Development status
 
-MMT rc.3/build 13 supports verified offline caching, per-address SSH pairing,
+MMT rc.4/build 14 supports verified offline caching, per-address SSH pairing,
 SD package management, operation journals and a dedicated Pilot integration.
 The APK ships without project archives; catalog-v2 supplies the separate Toolkit
 runtime and compatible project versions. Pilot 2.2.0 appears first and is selected
 by default. Beta 8 remains available for rollback; both are prerelease packages.
 
-Build 13 passed 120 Flutter tests, 41 helper tests on host and ARM, and
-attended stationary installation/start/browser/Stop/rollback checks on Polaris.
+Build 14 passed 124 Flutter tests and static analysis. The unchanged helper
+baseline passed 41 tests on host and ARM. Build 12 passed attended stationary
+installation/start/browser/Stop/rollback checks on Polaris.
 Clean installation into an empty Toolkit directory also passed on the existing
 SD filesystem. One connection interruption recovered through re-pairing; it did
 not recur during a 134-second monitored post-stop repeat, but its cause remains
@@ -22,12 +23,18 @@ unresolved. A subsequent installation on an empty 32 GB FAT card also passed
 using build 12. No alignment, tracking or observing-accuracy claim is made. See [attended acceptance](docs/ATTENDED-ACCEPTANCE.md) and
 [release details](RELEASE-CANDIDATE.md). Historical build 11 evidence is separate.
 
+Build 14 fixes an Android “app isn't responding” report during installation.
+SSH uploads now respect receive-window backpressure and yield between small
+writes so encryption cannot drain an unbounded upload queue on the UI isolate.
+The attended full-install retest passed with responsive tab switches and zero
+new ANRs. See [upload diagnosis and regression coverage](docs/SSH-UPLOAD-ANR.md).
+
 Firmware modification/restoration, boot integration, automatic updates and
 unmanaged-controller takeover are outside this version.
 
 ## Downloads and related repositories
 
-- [MMT rc.3/build 13 prerelease](https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/v0.1.0-rc.3)
+- [MMT rc.4/build 14 prerelease](https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/v0.1.0-rc.4)
 - [Standalone Toolkit runtime](https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/toolkit-runtime-v1.0.0)
 - [Pilot 2.2.0 port prerelease](https://github.com/jmtanous/alpaca-pilot-polaris-port/releases/tag/v0.2.0-rc.1)
 - [Shared Benro development environment](https://github.com/jmtanous/benro-dev-env)

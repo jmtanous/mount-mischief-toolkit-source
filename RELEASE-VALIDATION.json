@@ -1,40 +1,50 @@
 {
-  "version": "0.1.0-rc.3",
-  "build": 13,
-  "apk_sha256": "7946faee505600712f832adc0565bb016b58652b1da7dd2d67e7f751f341e586",
+  "version": "0.1.0-rc.4",
+  "build": 14,
+  "apk_sha256": "de4fb07cd73330ce69ce6b20d5bbd400c51382d4feb9efbce9403742a143a6df",
   "apk_bytes": 61400734,
   "signer_sha256": "868c4b51f7da0e23fb0277149fefac96808e37e42852219e5264d00f1b61fa68",
   "signature_verification": "passed",
   "debuggable": false,
   "bundled_projects": 0,
-  "runtime_sha256": "131b8458fe77d604c929bc2059cb737263096e42b63b7d12a6dcd5284cfc2b0c",
-  "flutter_tests": 120,
+  "flutter_tests": 124,
   "analysis": "no issues",
-  "functional_source_matches_review_checkout": true,
-  "physical_acceptance": {
-    "build13": "public catalog first fetch and runtime/project download from empty phone cache passed",
-    "build12": "stationary install/start/browser/stop/rollback and empty-card installation passed",
-    "scope": "No motion or observing-accuracy claim"
+  "fix": "SSH stdin backpressure with bounded 16 KiB writes and event-queue yields",
+  "regressions_failed_before_fix": [
+    "upload starved event queue",
+    "paused sink consumed full upload source"
+  ],
+  "transport_regressions": {
+    "count": 13,
+    "real_channel_window_pause_resume": "passed",
+    "real_channel_backpressured_timeout": "passed",
+    "byte_integrity_and_remote_completion": "passed"
   },
-  "public_phone_download": {
-    "result": "passed",
+  "attended_retest": {
     "phone": "Pixel 11 Pro, Android 17",
-    "cache_initially_empty": true,
-    "catalog": "public catalog-v2.json",
-    "selected_version": "2.2.0-port.0.2.0-rc.1",
-    "initial_download_bytes": 74038541,
-    "final_status": "Verified offline package",
-    "runtime_and_project_hashes_checked_by_app": true,
-    "github_credentials_used": false,
-    "pairing_and_settings_preserved": true,
-    "beta8_download": "passed",
-    "newest_first_picker": "passed",
-    "explicit_selection_survives_refresh": true,
-    "temporary_phone_settings_restored": true
+    "mount": "Benro Polaris",
+    "baseline": "empty active Toolkit directory; previous completed installation preserved in SD backup",
+    "runtime_install": "passed",
+    "pilot_install": "passed",
+    "project_version": "2.2.0-port.0.2.0-rc.1",
+    "verified_project_files": 4605,
+    "touch_during_transfer": "Device tab rendered at 13.7/56.9 MiB; Catalog and Installed rendered during validation",
+    "same_app_process_throughout": true,
+    "new_android_anr_events": 0,
+    "post_install_status_refresh": "passed",
+    "final_service": "stopped",
+    "final_controller_connections": 0,
+    "mmt_disconnected": true,
+    "temporary_phone_settings_restored": true,
+    "pilot_started": false,
+    "format_performed": false,
+    "motion_or_observing_accuracy_tested": false
   },
-  "prior_evidence": [
-    "docs/build12-release-validation.json",
-    "docs/empty-card-build12-acceptance.json",
-    "docs/ATTENDED-ACCEPTANCE.md"
-  ]
+  "unchanged": [
+    "Toolkit runtime",
+    "Pilot packages",
+    "Toolkit helpers",
+    "catalog-v2"
+  ],
+  "diagnosis": "docs/SSH-UPLOAD-ANR.md"
 }
