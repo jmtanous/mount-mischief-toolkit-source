@@ -1,0 +1,76 @@
+{
+  "schema": 2,
+  "projects": [
+    {
+      "schema": 1,
+      "id": "alpaca-pilot",
+      "name": "Alpaca Pilot",
+      "version": "2.2-beta8-port.0.1.0-rc.2",
+      "adapter": "alpaca-pilot-v1",
+      "min_manager_schema": 1,
+      "devices": [
+        "benro-polaris"
+      ],
+      "sha256": "30d34031d479505ce3f05a9cdabc6264f231ed7a2aec029edb0fff11c4467f1d",
+      "manifest_sha256": "be4dc0578820a067a9d2e5f83b343b251933693ec13e51d81b6367b094332907",
+      "archive_bytes": 59514845,
+      "unpacked_bytes": 174097245,
+      "resources": [
+        "benro-controller",
+        "tcp:5555",
+        "tcp:5556",
+        "tcp:8081"
+      ],
+      "asset_id": 777637653,
+      "recommended": true,
+      "min_integration_revision": 1,
+      "min_mmt_build": 12
+    },
+    {
+      "schema": 1,
+      "id": "alpaca-pilot",
+      "name": "Alpaca Pilot",
+      "version": "2.2.0-port.0.2.0-rc.1",
+      "adapter": "alpaca-pilot-v1",
+      "min_manager_schema": 1,
+      "devices": [
+        "benro-polaris"
+      ],
+      "sha256": "1e4fe3b33c0eeacafa85e9f4ae9e2558457e3bf38f22efee30529d4086a69520",
+      "manifest_sha256": "d528e77576481b425855a013702a353eadc9bd2c152bb4a84ae37edb9656c544",
+      "archive_bytes": 59696116,
+      "unpacked_bytes": 174814194,
+      "resources": [
+        "benro-controller",
+        "tcp:5555",
+        "tcp:5556",
+        "tcp:8081"
+      ],
+      "recommended": false,
+      "min_integration_revision": 1,
+      "min_mmt_build": 12,
+      "asset_owner": "jmtanous",
+      "asset_repo": "alpaca-pilot-polaris-port",
+      "asset_id": 784337565
+    }
+  ],
+  "runtime": {
+    "schema": 1,
+    "id": "toolkit-runtime",
+    "name": "Toolkit runtime",
+    "version": "1.0.0",
+    "adapter": "toolkit-runtime-v1",
+    "min_manager_schema": 1,
+    "devices": [
+      "benro-polaris"
+    ],
+    "sha256": "131b8458fe77d604c929bc2059cb737263096e42b63b7d12a6dcd5284cfc2b0c",
+    "manifest_sha256": "bf3279300947415e91047d861968b6b395ea3ee1efb4978dca676ed75a1ad9bc",
+    "archive_bytes": 14342425,
+    "unpacked_bytes": 42050655,
+    "resources": [],
+    "asset_id": 784333878,
+    "asset_owner": "jmtanous",
+    "asset_repo": "mount-mischief-toolkit-source"
+  }
+}

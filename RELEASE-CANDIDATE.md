@@ -17,9 +17,9 @@ The production-signed local APK contains zero bundled projects. 118 Flutter test
 artifact and signer evidence is in docs/build12-release-validation.json. These
 results do not replace attended testing of this candidate.
 
-Not published. The v2 catalog still needs verified asset IDs after authorized
-uploads. Existing public build 11, its legacy catalog and Beta 8 package are
-unchanged. Attended existing-SD startup, browser, Stop and settings rollback passed after
+The v2 catalog now references published runtime and Pilot assets verified by
+anonymous full downloads. Existing public build 11, its legacy catalog and Beta 8
+package remain unchanged. See docs/catalog-release-validation.json. Attended existing-SD startup, browser, Stop and settings rollback passed after
 connection recovery. Clean-directory standalone runtime installation and a 134-second monitored
 post-stop repeat also passed. The earlier recovered drop remains unexplained;
 no formatted-card or observing-accuracy claim is made. See docs/ATTENDED-ACCEPTANCE.md.

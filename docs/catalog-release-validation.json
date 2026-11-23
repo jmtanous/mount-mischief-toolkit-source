@@ -1,0 +1,27 @@
+{
+  "result": "passed",
+  "release_asset_ids_required": true,
+  "archives": [
+    {
+      "id": "toolkit-runtime",
+      "version": "1.0.0",
+      "sha256": "131b8458fe77d604c929bc2059cb737263096e42b63b7d12a6dcd5284cfc2b0c"
+    },
+    {
+      "id": "alpaca-pilot",
+      "version": "2.2-beta8-port.0.1.0-rc.2",
+      "sha256": "30d34031d479505ce3f05a9cdabc6264f231ed7a2aec029edb0fff11c4467f1d"
+    },
+    {
+      "id": "alpaca-pilot",
+      "version": "2.2.0-port.0.2.0-rc.1",
+      "sha256": "1e4fe3b33c0eeacafa85e9f4ae9e2558457e3bf38f22efee30529d4086a69520"
+    }
+  ],
+  "asset_ids": {
+    "runtime": 784333878,
+    "pilot220": 784337565,
+    "beta8": 777637653
+  },
+  "new_assets_verified_anonymously": true
+}
