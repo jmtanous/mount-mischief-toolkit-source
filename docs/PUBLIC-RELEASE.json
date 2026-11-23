@@ -1,42 +1,38 @@
 {
-  "verified_utc": "2026-11-23T20:31:22.310581+00:00",
+  "verified_utc": "2026-11-23T21:00:01.440492+00:00",
   "mmt": {
+    "verified_utc": "2026-11-23T21:00:01.440492+00:00",
     "repository": "jmtanous/mount-mischief-toolkit-source",
-    "tag": "v0.1.0-rc.3",
-    "release_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/v0.1.0-rc.3",
+    "tag": "v0.1.0-rc.4",
+    "release_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/tag/v0.1.0-rc.4",
     "anonymous": true,
     "assets": [
       {
-        "name": "SHA256SUMS",
-        "asset_id": 784434773,
-        "bytes": 201,
-        "sha256": "5de910401059849c319453106a34932e13d43fd4b6fe01ccbcb9dc1dc85bd8de",
-        "api_url": "https://api.github.com/repos/jmtanous/mount-mischief-toolkit-source/releases/assets/784434773",
-        "browser_download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/v0.1.0-rc.3/SHA256SUMS",
+        "name": "mmt-rc.4-source.tar.gz",
+        "asset_id": 784517484,
+        "bytes": 3260573,
+        "sha256": "a35fbb97449f5cdd40ccfe36f3ddf17c0656e1828136350a84c9b596711f2712",
         "anonymous": true,
-        "download_host": "release-assets.githubusercontent.com"
+        "download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/v0.1.0-rc.4/mmt-rc.4-source.tar.gz"
       },
       {
-        "name": "mmt-rc.3-source.tar.gz",
-        "asset_id": 784434767,
-        "bytes": 3256617,
-        "sha256": "e1df248a6104271cf37b101ca48ab79cde744cc55bb386027c7da96aabe838d4",
-        "api_url": "https://api.github.com/repos/jmtanous/mount-mischief-toolkit-source/releases/assets/784434767",
-        "browser_download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/v0.1.0-rc.3/mmt-rc.3-source.tar.gz",
-        "anonymous": true,
-        "download_host": "release-assets.githubusercontent.com"
-      },
-      {
-        "name": "mount-mischief-toolkit-0.1.0-rc.3-build13.apk",
-        "asset_id": 784434770,
+        "name": "mount-mischief-toolkit-0.1.0-rc.4-build14.apk",
+        "asset_id": 784517490,
         "bytes": 61400734,
-        "sha256": "7946faee505600712f832adc0565bb016b58652b1da7dd2d67e7f751f341e586",
-        "api_url": "https://api.github.com/repos/jmtanous/mount-mischief-toolkit-source/releases/assets/784434770",
-        "browser_download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/v0.1.0-rc.3/mount-mischief-toolkit-0.1.0-rc.3-build13.apk",
+        "sha256": "de4fb07cd73330ce69ce6b20d5bbd400c51382d4feb9efbce9403742a143a6df",
         "anonymous": true,
-        "download_host": "release-assets.githubusercontent.com"
+        "download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/v0.1.0-rc.4/mount-mischief-toolkit-0.1.0-rc.4-build14.apk"
+      },
+      {
+        "name": "SHA256SUMS",
+        "asset_id": 784517486,
+        "bytes": 201,
+        "sha256": "417d5dac6b4dfd47daee3ad5b4a1cf8d29dfa5a622a2d3d398f766619741104b",
+        "anonymous": true,
+        "download_url": "https://github.com/jmtanous/mount-mischief-toolkit-source/releases/download/v0.1.0-rc.4/SHA256SUMS"
       }
-    ]
+    ],
+    "source_commit": "1e03bb04eee9887d05197ba4754f2b0232254e4a"
   },
   "runtime": {
     "repository": "jmtanous/mount-mischief-toolkit-source",
@@ -87,7 +83,7 @@
       "2.2-beta8-port.0.1.0-rc.2"
     ]
   },
-  "source_snapshot_matches_tag_commit": "13344a75f5caa52fec7d305af153ee6d95333780",
-  "attended_validation": "docs/ATTENDED-ACCEPTANCE.md",
-  "release_validation": "docs/build13-release-validation.json"
+  "source_snapshot_matches_tag_commit": "1e03bb04eee9887d05197ba4754f2b0232254e4a",
+  "attended_validation": "docs/SSH-UPLOAD-ANR.md",
+  "release_validation": "docs/build14-release-validation.json"
 }
